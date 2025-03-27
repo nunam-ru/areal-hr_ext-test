@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar app color="#abcdef">
       <v-app-bar-title>
-        <h3 class="text-h4 white--text">HR management</h3>
+        <h3 class="text-h4 white--text">HR</h3>
       </v-app-bar-title>
     </v-app-bar>
     <Sidebar/>

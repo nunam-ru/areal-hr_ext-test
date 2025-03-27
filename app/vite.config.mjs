@@ -62,7 +62,7 @@ export default defineConfig({
     ],
   },
   server: {
-    port: 3000,
+    port: process.env.APP_PORT,
   },
   css: {
     preprocessorOptions: {
