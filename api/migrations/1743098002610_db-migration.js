@@ -38,15 +38,16 @@ exports.up = (pgm) => {
     pgm.createTable('positions', {
         id: 'id',
         name: { type: 'varchar(255)', notNull: true },
+        dep_id: { type: 'integer', notNull: true, references: 'departments' },
         created_at: {type: 'timestamptz'},
         updated_at: {type: 'timestamptz'},
         deleted_at: {type: 'timestamptz'},
     });
 
     pgm.sql(`
-        INSERT INTO positions (name, created_at) VALUES
-        ('HR-менеджер', current_timestamp),
-        ('Тестировщик', current_timestamp);
+        INSERT INTO positions (name, dep_id, created_at) VALUES
+        ('HR-менеджер', 1, current_timestamp),
+        ('Тестировщик', 2, current_timestamp);
     `)
 
     //сотрудники

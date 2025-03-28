@@ -6,42 +6,36 @@
           <th>Фамилия</th>
           <th>Имя</th>
           <th>Отчество</th>
-          <th>Дата рождения</th>
-          <th>Адрес</th>
-          <th>Паспорт серия</th>
-          <th>Номер</th>
+          <th>Логин</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in employees" :key="item.id">
+        <tr v-for="item in users" :key="item.id">
           <td>{{ item.id }}</td>
           <td>{{ item.last_name }}</td>
           <td>{{ item.first_name }}</td>
           <td>{{ item.third_name }}</td>
-          <td>{{ item.birth_date }}</td>
-          <td>{{ item.address }}</td>
-          <td>{{ item.passport_series }}</td>
-          <td>{{ item.passport_number }}</td>
+          <td>{{ item.login }}</td>
         </tr>
       </tbody>
     </v-table>
   </template>
   
   <script>
-  import EmployeesApi from "./employees_api";
+  import UsersApi from "./users_api";
   export default {
     data() {
       return {
-        employees: [],
+        users: [],
       };
     },
     mounted() {
-      this.fetchEmployees();
+      this.fetchUsers();
     },
     methods: {
-      fetchEmployees() {
-        EmployeesApi.getEmployees().then((data) => {
-            this.employees = data;
+      fetchUsers() {
+        UsersApi.getUsers().then((data) => {
+            this.users = data;
           }).catch((err) => {
             console.log(err)
           });
