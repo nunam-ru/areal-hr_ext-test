@@ -8,10 +8,7 @@ async function getOrganizations() {
       )
       return result.rows
     } catch (err) {
-      logger.error(`${fetching} organizations: ${err.message}`, {
-        stack: err.stack,
-      })
-      throw err
+      console.log(err)
     } finally {
       connection.release()
     }

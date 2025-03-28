@@ -16,10 +16,7 @@ async function getUsers() {
       )
       return result.rows
     } catch (err) {
-      logger.error(`${fetching} users: ${err.message}`, {
-        stack: err.stack,
-      })
-      throw err
+      console.log(err)
     } finally {
       connection.release()
     }

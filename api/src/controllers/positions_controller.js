@@ -13,10 +13,7 @@ async function getPositions() {
       )
       return result.rows
     } catch (err) {
-      logger.error(`${fetching} positions: ${err.message}`, {
-        stack: err.stack,
-      })
-      throw err
+      console.log(err)
     } finally {
       connection.release()
     }

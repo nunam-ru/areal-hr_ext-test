@@ -11,9 +11,7 @@ async function testDatabaseConnection() {
     console.log('Connected to PostgreSQL')
     client.release()
   } catch (err) {
-    logger.error(`${connect} db: ${err.message}`, {
-      stack: err.stack,
-    })
+    console.log(err)
     process.exit(1)
   }
 }

@@ -17,10 +17,7 @@ async function getEmployees() {
       )
       return result.rows
     } catch (err) {
-      logger.error(`${fetching} employees: ${err.message}`, {
-        stack: err.stack,
-      })
-      throw err
+      console.log(err)
     } finally {
       connection.release()
     }

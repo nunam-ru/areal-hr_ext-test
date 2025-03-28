@@ -3,6 +3,13 @@
   <v-container fluid class="d-flex flex-column" style="padding: 0">
     <v-toolbar flat>
       <v-toolbar-title>Сотрудники</v-toolbar-title>
+      <v-btn
+        @click="openAddDialog()"
+        variant="outlined"
+        class="white--text"
+      >
+        Добавить
+      </v-btn>
     </v-toolbar>
     <employees_table ref="employees_table" />
   </v-container>

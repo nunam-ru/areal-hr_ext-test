@@ -10,6 +10,7 @@
           <th>Адрес</th>
           <th>Паспорт серия</th>
           <th>Номер</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -22,6 +23,40 @@
           <td>{{ item.address }}</td>
           <td>{{ item.passport_series }}</td>
           <td>{{ item.passport_number }}</td>
+          <td>
+          <div class="action_buttons">
+            <v-btn color="blue" @click="openDetailsDialog(item)" small>
+              Подробнее
+            </v-btn>
+            <v-btn
+              color="blue"
+              @click="openFilesDialog(item)"
+              small
+              :disabled="item.fired === true"
+            >
+              Файлы
+            </v-btn>
+            <v-btn
+              color="blue"
+              @click="openEditDialog(item)"
+              small
+              :disabled="item.fired === true"
+            >
+              Изменить
+            </v-btn>
+            <v-btn color="blue" @click="openHistoryDialog(item)" small
+              >История</v-btn
+            >
+            <v-btn
+              color="red"
+              @click="openDismissDialog(item)"
+              small
+              :disabled="item.fired === true"
+            >
+              Уволить
+            </v-btn>
+          </div>
+        </td>
         </tr>
       </tbody>
     </v-table>
@@ -52,11 +87,18 @@
 
   <style scoped>
   td, th {
-    max-width: 150px;
+    max-width: 200px;
   }
 
   th {
     background-color: rgb(238, 238, 238);
+  }
+
+  .action_buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  padding: 10% 0;
   }
   </style>
   
