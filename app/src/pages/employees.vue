@@ -1,27 +1,30 @@
 <template>
   <!-- <HelloWorld /> -->
-  <div>
-        <h1>{{ message }}</h1>
-  </div>
+  <v-container fluid class="d-flex flex-column" style="padding: 0">
+    <v-toolbar flat>
+      <v-toolbar-title>Сотрудники</v-toolbar-title>
+    </v-toolbar>
+    <employees_table ref="employees_table" />
+  </v-container>
 </template>
 
 <script>
-  import axios from 'axios';
+  //import employees_api from "@/modules/employees/employees_api";
+  import employees_table from "@/modules/employees/employees_table.vue";
 
   export default {
-  data() {
-      return {
-      message: ''
-      };
+  components: {
+    employees_table,
   },
-  mounted() {
-      axios.get('http://localhost:3000/api/hello')
-      .then(response => {
-          this.message = response.data.message;
-      })
-      .catch(error => {
-          console.error('error', error);
-      });
-  }
+  data() {
+    return {
+      message: '',
+    };
+  },
+  methods: {
+    refreshEmployees() {
+      this.$refs.employees_table.fetchEmployees();
+    }
+  },
   };
 </script>

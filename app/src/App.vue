@@ -6,7 +6,7 @@
       </v-app-bar-title>
     </v-app-bar>
     <Sidebar/>
-    <v-main app class="pa-4">
+    <v-main app > <!--class="pa-4"-->
       <router-view></router-view>
     </v-main>
   </v-app>
@@ -18,7 +18,7 @@
   export default{
     components:
     {
-      Sidebar
+      Sidebar,
     }
   };
 </script>

@@ -1,7 +1,5 @@
 require('dotenv').config({ path: '../.env' })
 const { Pool } = require('pg')
-const logger = require('./../logger/logger')
-const { connect } = require('../errors/text-errors')
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
