@@ -14,7 +14,8 @@ async function getDepartments() {
         FROM departments AS d \
         LEFT JOIN departments AS pd \
         ON d.parent_id = pd.id \
-        LEFT JOIN organizations AS o ON d.org_id = o.id;",
+        LEFT JOIN organizations AS o ON d.org_id = o.id \
+        WHERE d.deleted_at IS NULL;",
       )
       return result.rows
     } catch (err) {
@@ -111,7 +112,7 @@ async function updateDepartment(
 
     if (parent_id) {
       query = `UPDATE departments 
-                SET name = $1, comment = $2, parent_id = $3, org_id = $4
+                SET name = $1, comment = $2, parent_id = $3, org_id = $4, updated_at = current_timestamp
                 WHERE id = $5 RETURNING *`
       values = [name, comment, parent_id, org_id, id]
       parent = await connection.query(
@@ -124,7 +125,7 @@ async function updateDepartment(
       }
     } else {
       query = `UPDATE departments 
-                SET name = $1, comment = $2, parent_id = NULL, org_id = $3
+                SET name = $1, comment = $2, parent_id = NULL, org_id = $3, updated_at = current_timestamp
                 WHERE id = $4 RETURNING *`
       values = [name, comment, org_id, id]
     }
@@ -136,7 +137,7 @@ async function updateDepartment(
 
     await connection.query(
       `UPDATE departments
-      SET org_id = $1
+      SET org_id = $1, updated_at = current_timestamp
       WHERE parent_id = $2
       RETURNING *`,
       [org_id, id],
@@ -156,10 +157,16 @@ async function deleteDepartment(id) {
   const connection = await pool.connect()
   try {
     await connection.query('BEGIN')
+    // const result = await connection.query(
+    //   'DELETE FROM departments WHERE id = $1 RETURNING *',
+    //   [id],
+    // )
+
     const result = await connection.query(
-      'DELETE FROM departments WHERE id = $1 RETURNING *',
-      [id],
-    )
+        'UPDATE departments \
+        SET deleted_at = current_timestamp WHERE id = $1 RETURNING *',
+        [id],
+      )
 
     await connection.query('COMMIT')
     return result.rows[0]
