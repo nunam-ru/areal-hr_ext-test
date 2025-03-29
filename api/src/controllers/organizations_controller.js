@@ -4,7 +4,7 @@ async function getOrganizations() {
     const connection = await pool.connect()
     try {
       const result = await connection.query(
-        "SELECT * FROM organizations",
+        "SELECT * FROM organizations WHERE deleted_at IS NULL;",
       )
       return result.rows
     } catch (err) {
@@ -14,6 +14,91 @@ async function getOrganizations() {
     }
   }
 
-  module.exports = {
-    getOrganizations,
+async function addOrganization(req, name, comment) {
+  const connection = await pool.connect()
+  try {
+    await connection.query('BEGIN')
+    const result = await connection.query(
+      'INSERT INTO organizations (name, comment, created_at) VALUES ($1, $2, current_timestamp) RETURNING id',
+      [name, comment],
+    )
+
+    const organizationId = result.rows[0].id
+
+    const newValue = `Название: ${name}\nКомментарий: ${comment}`
+
+    await connection.query('COMMIT')
+    return result.rows[0]
+  } catch (err) {
+    await connection.query('ROLLBACK')
+    console.log(err)
+  } finally {
+    connection.release()
   }
+}
+async function updateOrganization(req, id, name, comment) {
+  const connection = await pool.connect()
+  try {
+    await connection.query('BEGIN')
+
+    const oldDataResult = await connection.query(
+      'SELECT name, comment FROM organizations WHERE id = $1',
+      [id],
+    )
+
+    const result = await connection.query(
+      'UPDATE organizations SET name = $1, comment = $2, updated_at = current_timestamp WHERE id = $3',
+      [name, comment, id],
+    )
+    let oldValue = ''
+    let newValue = ''
+    if (oldDataResult.rows[0].name != name) {
+      oldValue += `Название: ${oldDataResult.rows[0].name}\n`
+      newValue += `Название: ${name}\n`
+    }
+    if (oldDataResult.rows[0].comment != comment) {
+      oldValue += `Комментарий: ${oldDataResult.rows[0].comment}\n`
+      newValue += `Комментарий: ${comment}\n`
+    }
+
+    await connection.query('COMMIT')
+    return result.rows[0]
+  } catch (err) {
+    await connection.query('ROLLBACK')
+    console.log(err)
+  } finally {
+    connection.release()
+  }
+}
+async function deleteOrganization(id) {
+  const connection = await pool.connect()
+  try {
+    await connection.query('BEGIN')
+    // const result = await connection.query(
+    //   'DELETE FROM organizations WHERE id = $1',
+    //   [id],
+    // )
+
+    const result = await connection.query(
+      'UPDATE organizations \
+      SET deleted_at = current_timestamp WHERE id = $1 RETURNING *',
+      [id],
+    )
+
+    await connection.query('COMMIT')
+    return result.rows[0]
+  } catch (err) {
+    await connection.query('ROLLBACK')
+    console.log(err)
+  } finally {
+    connection.release()
+  }
+}
+
+module.exports = {
+  getOrganizations,
+  addOrganization,
+  updateOrganization,
+  deleteOrganization,
+}
+  

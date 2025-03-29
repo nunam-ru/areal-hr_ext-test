@@ -5,6 +5,7 @@
           <th>Код</th>
           <th>Должность</th>
           <th>Отдел</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -12,6 +13,16 @@
           <td>{{ item.id }}</td>
           <td>{{ item.position_name }}</td>
           <td>{{ item.department_name }}</td>
+          <td>
+            <div class="action_buttons">
+              <v-btn color="blue" @click="openEditDialog(item)" small
+              >Изменить</v-btn
+              >
+              <v-btn color="red" @click="openDeleteDialog(item.id)" small
+                >Удалить</v-btn
+              >
+            </div>
+          </td>
         </tr>
       </tbody>
     </v-table>
@@ -36,6 +47,12 @@
             console.log(err)
           });
       },
+      openEditDialog(item) {
+      this.$emit("edit", item);
+      },
+      openDeleteDialog(id) {
+        this.$emit("delete", id);
+      },
     },
   };
   </script>
@@ -47,6 +64,13 @@
 
   th {
     background-color: rgb(238, 238, 238);
+  }
+
+  .action_buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+    padding: 10% 0;
   }
   </style>
   
