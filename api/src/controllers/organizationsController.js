@@ -1,4 +1,5 @@
-const pool = require('./../services/db')
+const pool = require('../services/db')
+const { addChangelog } = require('./changelogController')
 
 async function getOrganizations() {
     const connection = await pool.connect()
@@ -17,15 +18,31 @@ async function getOrganizations() {
 async function addOrganization(req, name, comment) {
   const connection = await pool.connect()
   try {
+    let changes = {}
+
     await connection.query('BEGIN')
     const result = await connection.query(
-      'INSERT INTO organizations (name, comment, created_at) VALUES ($1, $2, current_timestamp) RETURNING id',
+      'INSERT INTO organizations (name, comment, created_at) \
+      VALUES ($1, $2, current_timestamp) \
+      ON CONFLICT (name) DO UPDATE \
+      SET deleted_at = null, \
+      comment = $2, \
+      updated_at = current_timestamp \
+      RETURNING id',
       [name, comment],
     )
 
     const organizationId = result.rows[0].id
 
     const newValue = `Название: ${name}\nКомментарий: ${comment}`
+
+    changes = { 
+      "object" : 1, 
+      "record" : organizationId,
+      "oldValue" : '',
+      "newValue" : newValue
+    }
+    await addChangelog(1, changes, connection, req)
 
     await connection.query('COMMIT')
     return result.rows[0]
@@ -40,6 +57,8 @@ async function updateOrganization(req, id, name, comment) {
   const connection = await pool.connect()
   try {
     await connection.query('BEGIN')
+
+    let changes = {}
 
     const oldDataResult = await connection.query(
       'SELECT name, comment FROM organizations WHERE id = $1',
@@ -60,6 +79,14 @@ async function updateOrganization(req, id, name, comment) {
       oldValue += `Комментарий: ${oldDataResult.rows[0].comment}\n`
       newValue += `Комментарий: ${comment}\n`
     }
+
+    changes = { 
+      "object" : 1, 
+      "record" : id,
+      "oldValue" : oldValue,
+      "newValue" : newValue
+    }
+    await addChangelog(1, changes, connection, req)
 
     await connection.query('COMMIT')
     return result.rows[0]

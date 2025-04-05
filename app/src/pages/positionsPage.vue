@@ -35,10 +35,10 @@
 </template>
 
 <script>
-  import positions_api from "@/modules/positions/positions_api";
-  import positions_table from "@/modules/positions/positions_table.vue";
-  import PositionForm from "@/modules/positions/positions_form.vue";
-  import PositionDeleteDialog from "@/modules/positions/positions_delete.vue";
+  //import positions_api from "@/modules/positions/positionsApi";
+  import positions_table from "@/modules/positions/positionsTable.vue";
+  import PositionForm from "@/modules/positions/positionsForm.vue";
+  import PositionDeleteDialog from "@/modules/positions/positionsDelete.vue";
 
   export default {
   components: {

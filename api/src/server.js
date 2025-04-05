@@ -1,14 +1,14 @@
 require('dotenv').config({ path: '../../.env' })
 const express = require('express')
-const bodyParser = require('body-parser');
+//const bodyParser = require('body-parser');
+//const session = require('express-session')
 const cors = require('cors');
-const session = require('express-session')
 
-const employees_router = require('./router/employees_router')
-const departments_router = require('./router/departments_router')
-const organizations_router = require('./router/organizations_router')
-const positions_router = require('./router/positions_router')
-const users_router = require('./router/users_router')
+const employees_router = require('./router/employeesRouter')
+const departments_router = require('./router/departmentsRouter')
+const organizations_router = require('./router/organizationsRouter')
+const positions_router = require('./router/positionsRouter')
+const users_router = require('./router/usersRouter')
 
 const app = express();
 const port = process.env.API_PORT;

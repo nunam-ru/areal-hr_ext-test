@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Employees from "../pages/employees.vue";
-import Departments from "../pages/departments.vue";
-import Organizations from "../pages/organizations.vue";
-import Positions from "../pages/positions.vue";
-import Users from "../pages/users.vue";
+import Employees from "../pages/employeesPage.vue";
+import Departments from "../pages/departmentsPage.vue";
+import Organizations from "../pages/organizationsPage.vue";
+import Positions from "../pages/positionsPage.vue";
+import Users from "../pages/usersPage.vue";
 
 const routes = [
   { path: "/employees", component: Employees },

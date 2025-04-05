@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import DepartmentApi from "./departments_api";
+import DepartmentApi from "./departmentsApi";
 
 export default {
   props: {

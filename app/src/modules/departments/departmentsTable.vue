@@ -33,7 +33,7 @@
   </template>
   
   <script>
-  import DepartmentsApi from "./departments_api";
+  import DepartmentsApi from "./departmentsApi";
   export default {
     data() {
       return {

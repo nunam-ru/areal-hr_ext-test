@@ -1,10 +1,10 @@
 const express = require('express')
 const router = express.Router()
-const pool = require('./../services/db')
+const pool = require('../services/db')
 
 const {
   getEmployees,
-} = require('../controllers/employees_controller')
+} = require('../controllers/employeesController')
 
 router.get('/employees', async (req, res) => {
   try {

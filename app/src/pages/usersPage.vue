@@ -10,7 +10,7 @@
 
 <script>
   //import employees_api from "@/modules/employees/employees_api";
-  import users_table from "@/modules/users/users_table.vue";
+  import users_table from "@/modules/users/usersTable.vue";
 
   export default {
   components: {

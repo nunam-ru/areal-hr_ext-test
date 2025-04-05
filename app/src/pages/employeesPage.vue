@@ -17,7 +17,7 @@
 
 <script>
   //import employees_api from "@/modules/employees/employees_api";
-  import employees_table from "@/modules/employees/employees_table.vue";
+  import employees_table from "@/modules/employees/employeesTable.vue";
 
   export default {
   components: {

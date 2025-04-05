@@ -3,16 +3,16 @@
       <thead>
         <tr>
           <th>Код</th>
-          <th>Должность</th>
-          <th>Отдел</th>
+          <th>Организация</th>
+          <th>Комментарий</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in positions" :key="item.id">
+        <tr v-for="item in organizations" :key="item.id">
           <td>{{ item.id }}</td>
-          <td>{{ item.position_name }}</td>
-          <td>{{ item.department_name }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.comment }}</td>
           <td>
             <div class="action_buttons">
               <v-btn color="blue" @click="openEditDialog(item)" small
@@ -29,29 +29,29 @@
   </template>
   
   <script>
-  import PositionsApi from "./positions_api";
+  import OrganizationsApi from "./organizationsApi";
   export default {
     data() {
       return {
-        positions: [],
+        organizations: [],
       };
     },
     mounted() {
-      this.fetchPositions();
+      this.fetchOrganizations();
     },
     methods: {
-      fetchPositions() {
-        PositionsApi.getPositions().then((data) => {
-            this.positions = data;
-          }).catch((err) => {
-            console.log(err)
-          });
-      },
       openEditDialog(item) {
-      this.$emit("edit", item);
+        this.$emit("edit", item);
       },
       openDeleteDialog(id) {
         this.$emit("delete", id);
+      },
+      fetchOrganizations() {
+        OrganizationsApi.getOrganizations().then((data) => {
+            this.organizations = data;
+          }).catch((err) => {
+            console.log(err)
+          });
       },
     },
   };

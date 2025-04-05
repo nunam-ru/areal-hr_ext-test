@@ -34,7 +34,7 @@
       @update:deleteDialog="deleteDialog = $event"
       @delete="refreshDepartments"
     />
-    <departments_table ref="departments_table"
+    <departmentsTable ref="departmentsTable"
     @edit="openEditDialog"
     @delete="openDeleteDialog"
     @updateDepartments="handleUpdateDepartments"/>
@@ -42,17 +42,17 @@
 </template>
 
 <script>
-  import departments_api from "@/modules/departments/departments_api";
-  import departments_table from "@/modules/departments/departments_table.vue";
-  import DepartmentForm from "@/modules/departments/departments_form.vue";
-  import DepartmentDeleteDialog from "@/modules/departments/departments_delete.vue";
+  //import departments_api from "@/modules/departments/departmentsApi";
+  import departmentsTable from "@/modules/departments/departmentsTable.vue";
+  import DepartmentForm from "@/modules/departments/departmentsForm.vue";
+  import DepartmentDeleteDialog from "@/modules/departments/departmentsDelete.vue";
 
 
   export default {
   components: {
     DepartmentForm,
     DepartmentDeleteDialog,
-    departments_table,
+    departmentsTable,
   },
   data() {
     return {
@@ -76,7 +76,7 @@
       this.departments = departments;
     },
     refreshDepartments() {
-      this.$refs.departments_table.fetchDepartments();
+      this.$refs.departmentsTable.fetchDepartments();
     },
     openAddDialog(isSubDepartmentMode) {
       this.isAddMode = true;

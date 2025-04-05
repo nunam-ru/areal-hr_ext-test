@@ -63,7 +63,7 @@
   </template>
   
   <script>
-  import EmployeesApi from "./employees_api";
+  import EmployeesApi from "./employeesApi";
   export default {
     data() {
       return {

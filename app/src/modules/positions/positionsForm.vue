@@ -38,8 +38,8 @@
   </template>
   
   <script>
-  import PositionApi from "./positions_api";
-  import DepartmentApi from "@/modules/departments/departments_api";
+  import PositionApi from "./positionsApi";
+  import DepartmentApi from "@/modules/departments/departmentsApi";
   export default {
     props: {
       dialog: {

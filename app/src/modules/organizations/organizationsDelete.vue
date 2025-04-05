@@ -6,53 +6,53 @@
     >
       <v-card>
         <v-card-title class="headline">Подтверждение удаления</v-card-title>
-        <v-card-text>Вы точно хотите удалить данную должность?</v-card-text>
+        <v-card-text>Вы точно хотите удалить данную организацию?</v-card-text>
         <v-card-actions>
           <v-btn color="blue" text @click="closeDialog">Отмена</v-btn>
-          <v-btn color="red" text @click="deletePosition">Удалить</v-btn>
+          <v-btn color="red" text @click="deleteOrganization">Удалить</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
   </template>
   
   <script>
-  import PositionApi from "./positions_api";
+  import OrganizationsApi from "./organizationsApi";
   export default {
     props: {
       deleteDialog: {
         type: Boolean,
         required: true,
       },
-      deletePositionId: {
+      deleteOrganizationId: {
         type: Number,
         required: true,
       },
     },
+    emits: ["update:deleteDialog", "delete"],
     data() {
       return {
-        localdeletePositionId: this.deletePositionId,
+        localdeleteOrganizationId: this.deleteOrganizationId,
       };
     },
     watch: {
-      deletePositionId(newId) {
-        this.localdeletePositionId = newId;
+      deleteOrganizationId(newId) {
+        this.localdeleteOrganizationId = newId;
       },
     },
-    emits: ["update:deleteDialog", "delete"],
     methods: {
       closeDialog() {
         this.$emit("update:deleteDialog", false);
       },
-      deletePosition() {
-        PositionApi.deletePosition(this.localdeletePositionId)
+      deleteOrganization() {
+        OrganizationsApi.deleteOrganization(this.localdeleteOrganizationId)
           .then(() => {
             this.$emit("delete");
             this.closeDialog();
-            this.localdeletePositionId = null;
+            this.localdeleteOrganizationId = null;
           })
           .catch((err) => {
-            console.log(err)
-          });
+            console.log(err)    
+        });
       },
     },
   };

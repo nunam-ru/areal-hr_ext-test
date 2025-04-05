@@ -1,4 +1,5 @@
-const pool = require('./../services/db')
+const pool = require('../services/db')
+const { addChangelog } = require('./changelogController')
 
 async function getPositions() {
     const connection = await pool.connect()
@@ -24,6 +25,9 @@ async function addPosition(req, name, dep_id) {
   const connection = await pool.connect()
   try {
     await connection.query('BEGIN')
+
+    let changes = {}
+
     const result = await connection.query(
       `INSERT INTO positions (name, dep_id, created_at) 
         VALUES ($1, $2, current_timestamp) RETURNING *`,
@@ -36,6 +40,14 @@ async function addPosition(req, name, dep_id) {
       [dep_id],
     )
     const newValue = `Название: ${name}\nОтдел: ${department.rows[0].name}`
+
+    changes = { 
+      "object" : 3, 
+      "record" : positionId,
+      "oldValue" : '',
+      "newValue" : newValue
+    }
+    await addChangelog(3, changes, connection, req)
 
     await connection.query('COMMIT')
     return result.rows[0]
@@ -51,6 +63,8 @@ async function updatePosition(req, id, name, dep_id) {
   const connection = await pool.connect()
   try {
     await connection.query('BEGIN')
+
+    let changes = {}
 
     const oldDataResult = await connection.query(
       'SELECT positions.name as positions_name, departments.name as departments_name FROM positions join departments on positions.dep_id = departments.id WHERE positions.id = $1',
@@ -78,6 +92,13 @@ async function updatePosition(req, id, name, dep_id) {
       newValue += `Отдел: ${department.rows[0].name}\n`
     }
 
+    changes = { 
+      "object" : 3, 
+      "record" : id,
+      "oldValue" : oldValue,
+      "newValue" : newValue
+    }
+    await addChangelog(3, changes, connection, req)
 
     await connection.query('COMMIT')
     return result.rows[0]

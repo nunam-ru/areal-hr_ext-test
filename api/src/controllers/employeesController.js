@@ -1,4 +1,4 @@
-const pool = require('./../services/db')
+const pool = require('../services/db')
 
 async function getEmployees() {
     const connection = await pool.connect()

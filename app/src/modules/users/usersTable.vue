@@ -22,7 +22,7 @@
   </template>
   
   <script>
-  import UsersApi from "./users_api";
+  import UsersApi from "./usersApi";
   export default {
     data() {
       return {

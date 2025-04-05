@@ -37,10 +37,10 @@
 </template>
 
 <script>
-  import organizations_api from "@/modules/departments/departments_api";
-  import organizations_table from "@/modules/organizations/organizations_table.vue";
-  import OrganizationForm from "@/modules/organizations/organizations_form.vue";
-  import OrganizationDeleteDialog from "@/modules/organizations/organizations_delete.vue";
+  //import organizations_api from "@/modules/departments/departmentsApi";
+  import organizations_table from "@/modules/organizations/organizationsTable.vue";
+  import OrganizationForm from "@/modules/organizations/organizationsForm.vue";
+  import OrganizationDeleteDialog from "@/modules/organizations/organizationsDelete.vue";
   
   export default {
   components: {

@@ -1,4 +1,5 @@
-const pool = require('./../services/db')
+const pool = require('../services/db')
+const { addChangelog } = require('./changelogController')
 
 async function getDepartments() {
     const connection = await pool.connect()
@@ -33,6 +34,7 @@ async function addDepartment(req, name, comment, parent_id, org_id) {
     let values
     let newValue
     let parent
+    let changes = {}
 
     const organization = await connection.query(
       'SELECT name FROM organizations WHERE id = $1',
@@ -48,6 +50,7 @@ async function addDepartment(req, name, comment, parent_id, org_id) {
         [parent_id],
       )
       newValue = `Название: ${name}\nКомментарий: ${comment}\nРодитель: ${parent.rows[0].name}\nОрганизация: ${organization.rows[0].name}`
+
     } else {
       query = `INSERT INTO departments (name, comment, org_id, created_at) 
                 VALUES ($1, $2, $3, current_timestamp) RETURNING *`
@@ -58,6 +61,14 @@ async function addDepartment(req, name, comment, parent_id, org_id) {
     const result = await connection.query(query, values)
 
     const departmentId = result.rows[0].id
+
+    changes = { 
+      "object" : 2, 
+      "record" : departmentId,
+      "oldValue" : '',
+      "newValue" : newValue
+    }
+    await addChangelog(2, changes, connection, req)
 
     await connection.query('COMMIT')
     return result.rows[0]
@@ -85,6 +96,7 @@ async function updateDepartment(
     let parent
     let newValue = ''
     let oldValue = ''
+    let changes = {}
     const oldDataResult = await connection.query(
       'SELECT d.name AS department_name, \
       pd.name AS parent_department_name, \
@@ -142,6 +154,14 @@ async function updateDepartment(
       RETURNING *`,
       [org_id, id],
     )
+
+    changes = { 
+      "object" : 2, 
+      "record" : id,
+      "oldValue" : oldValue,
+      "newValue" : newValue
+    }
+    await addChangelog(2, changes, connection, req)
 
     await connection.query('COMMIT')
     return result.rows[0]

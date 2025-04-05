@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const pool = require('./../services/db')
+const pool = require('../services/db')
 const { StatusCodes } = require('http-status-codes')
 
 const {
@@ -8,9 +8,9 @@ const {
   addOrganization,
   updateOrganization,
   deleteOrganization,
-} = require('../controllers/organizations_controller')
+} = require('../controllers/organizationsController')
 
-const organizationSchema = require('../controllers/organizations_val')
+const organizationSchema = require('../controllers/val/organizationsVal')
 
 router.get('/organizations', async (req, res) => {
   try {

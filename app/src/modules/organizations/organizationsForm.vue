@@ -35,7 +35,7 @@
   </template>
   
   <script>
-  import OrganizationsApi from "./organizations_api";
+  import OrganizationsApi from "./organizationsApi";
   
   export default {
     props: {

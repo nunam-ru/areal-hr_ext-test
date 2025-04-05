@@ -1,10 +1,10 @@
 const express = require('express')
 const router = express.Router()
-const pool = require('./../services/db')
+const pool = require('../services/db')
 
 const {
   getUsers,
-} = require('../controllers/users_controller')
+} = require('../controllers/usersController')
 
 router.get('/users', async (req, res) => {
   try {

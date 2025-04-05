@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const pool = require('./../services/db')
+const pool = require('../services/db')
 const { StatusCodes } = require('http-status-codes')
 
 const {
@@ -8,9 +8,9 @@ const {
   addPosition,
   updatePosition,
   deletePosition,
-} = require('../controllers/positions_controller')
+} = require('../controllers/positionsController')
 
-const positionSchema = require('../controllers/positions_val')
+const positionSchema = require('../controllers/val/positionsVal')
 
 
 router.get('/positions', async (req, res) => {

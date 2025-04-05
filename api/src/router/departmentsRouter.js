@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const pool = require('./../services/db')
+const pool = require('../services/db')
 const { StatusCodes } = require('http-status-codes')
 
 const {
@@ -8,9 +8,9 @@ const {
   addDepartment,
   updateDepartment,
   deleteDepartment,
-} = require('../controllers/departments_controller')
+} = require('../controllers/departmentsController')
 
-const departmentSchema = require('../controllers/departments_val')
+const departmentSchema = require('../controllers/val/departmentsVal')
 
 router.get('/departments', async (req, res) => {
   try {
