@@ -22,6 +22,9 @@
             <v-btn color="blue" @click="openEditDialog(item)" small
             >Изменить</v-btn
             >
+            <v-btn color="blue" @click="openChangelogDialog(item)" small
+              >История</v-btn
+              >
             <v-btn color="red" @click="openDeleteDialog(item.department_id)" small
               >Удалить</v-btn
             >
@@ -47,6 +50,7 @@
       fetchDepartments() {
         DepartmentsApi.getDepartments().then((data) => {
             this.departments = data;
+            this.$emit("updateDepartments", this.departments);
           }).catch((err) => {
             console.log(err)
           });
@@ -56,6 +60,9 @@
       },
       openDeleteDialog(id) {
         this.$emit("delete", id);
+      },
+      openChangelogDialog(item) {
+        this.$emit("changelog", item);
       },
     },
   };

@@ -34,30 +34,41 @@
       @update:deleteDialog="deleteDialog = $event"
       @delete="refreshDepartments"
     />
+
+    <changelogDialog
+      :changelogDialog="changelogDialog"
+      :changelog="depChangelog"
+      @update:changelogDialog="changelogDialog = $event"
+    />
+
     <departmentsTable ref="departmentsTable"
-    @edit="openEditDialog"
-    @delete="openDeleteDialog"
-    @updateDepartments="handleUpdateDepartments"/>
+      @edit="openEditDialog"
+      @delete="openDeleteDialog"
+      @updateDepartments="handleUpdateDepartments"
+      @changelog="fetchDepChangelog"
+    />
   </v-container>
 </template>
 
 <script>
-  //import departments_api from "@/modules/departments/departmentsApi";
+  import DepartmentsApi from "@/modules/departments/departmentsApi";
   import departmentsTable from "@/modules/departments/departmentsTable.vue";
   import DepartmentForm from "@/modules/departments/departmentsForm.vue";
   import DepartmentDeleteDialog from "@/modules/departments/departmentsDelete.vue";
-
+  import changelogDialog from "@/components/changelogDialog.vue";
 
   export default {
   components: {
     DepartmentForm,
     DepartmentDeleteDialog,
     departmentsTable,
+    changelogDialog,
   },
   data() {
     return {
       dialog: false,
       deleteDialog: false,
+      changelogDialog: false,
       isSubDepartmentMode: false,
       TableDepartment: {
         department_id: null,
@@ -68,6 +79,7 @@
       },
       deleteDepartmentId: 0,
       departments: [],
+      depChangelog: [],
       isAddMode: false,
     };
   },
@@ -91,13 +103,24 @@
     },
     openEditDialog(department) {
       this.isAddMode = false;
-      this.isSubDepartmentMode = !!department.parent_department_name;
+      this.isSubDepartmentMode = !!department.parent_name;
       this.TableDepartment = { ...department };
       this.dialog = true;
     },
     openDeleteDialog(id) {
       this.deleteDepartmentId = id;
       this.deleteDialog = true;
+    },
+    fetchDepChangelog(item) {
+      DepartmentsApi.getDepChangelog(item.department_id)
+        .then((data) => {
+          this.depChangelog = data;
+          this.changelogDialog = true;
+        })
+        .catch((err) => {
+          console.log(err);
+          this.depChangelog = [];
+        });
     },
   },
   };

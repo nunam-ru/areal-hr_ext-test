@@ -132,7 +132,7 @@ exports.up = (pgm) => {
         id: 'id',
         date: { type: 'timestamptz', notNull: true },
         object: { type: 'varchar(255)', notNull: true },
-        changes: { type: 'json', notNull: true },
+        changes: { type: 'jsonb', notNull: true },
         user_id: { type: 'integer', notNull: true, references: 'users' },
     });
 

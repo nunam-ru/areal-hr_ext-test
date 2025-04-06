@@ -26,37 +26,48 @@
       @delete="refreshPositions"
     />
 
+    <changelogDialog
+      :changelogDialog="changelogDialog"
+      :changelog="posChangelog"
+      @update:changelogDialog="changelogDialog = $event"
+    />
+
     <positions_table ref="positions_table"
       @edit="openEditDialog"
       @delete="openDeleteDialog" 
+      @changelog="fetchPosChangelog"
     />
 
   </v-container>
 </template>
 
 <script>
-  //import positions_api from "@/modules/positions/positionsApi";
+  import PositionsApi from "@/modules/positions/positionsApi";
   import positions_table from "@/modules/positions/positionsTable.vue";
   import PositionForm from "@/modules/positions/positionsForm.vue";
   import PositionDeleteDialog from "@/modules/positions/positionsDelete.vue";
+  import changelogDialog from "@/components/changelogDialog.vue";
 
   export default {
   components: {
     positions_table,
     PositionForm,
     PositionDeleteDialog,
+    changelogDialog,
   },
   data() {
     return {
       dialog: false,
       isEditMode: false,
       deleteDialog: false,
+      changelogDialog: false,
       deletePositionId: 0,
       TablePosition: {
         id: null,
         position_name: "",
         dep_id: null,
       },
+      posChangelog: [],
     };
   },
   methods: {
@@ -76,6 +87,17 @@
     openDeleteDialog(id) {
       this.deletePositionId = id;
       this.deleteDialog = true;
+    },
+    fetchPosChangelog(item) {
+      PositionsApi.getPosChangelog(item.id)
+        .then((data) => {
+          this.posChangelog = data;
+          this.changelogDialog = true;
+        })
+        .catch((err) => {
+          console.log(err);
+          this.posChangelog = [];
+        });
     },
   },
   };

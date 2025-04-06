@@ -157,7 +157,7 @@ async function updateDepartment(
 
     changes = { 
       "object" : 2, 
-      "record" : id,
+      "record" : parseInt(id),
       "oldValue" : oldValue,
       "newValue" : newValue
     }

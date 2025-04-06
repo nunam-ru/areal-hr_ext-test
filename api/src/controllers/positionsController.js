@@ -94,7 +94,7 @@ async function updatePosition(req, id, name, dep_id) {
 
     changes = { 
       "object" : 3, 
-      "record" : id,
+      "record" : parseInt(id),
       "oldValue" : oldValue,
       "newValue" : newValue
     }

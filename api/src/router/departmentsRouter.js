@@ -10,12 +10,25 @@ const {
   deleteDepartment,
 } = require('../controllers/departmentsController')
 
+const { getChangelog, } = require('../controllers/changelogController')
+
 const departmentSchema = require('../controllers/val/departmentsVal')
 
 router.get('/departments', async (req, res) => {
   try {
     const departments = await getDepartments()
     return res.json(departments)
+  } catch (err) {
+    console.error('Error departments:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
+router.get('/departments/changelog/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const depChangelog = await getChangelog(2, id)
+    return res.json(depChangelog)
   } catch (err) {
     console.error('Error departments:', err);
     res.status(500).json({ error: 'Internal server error' });

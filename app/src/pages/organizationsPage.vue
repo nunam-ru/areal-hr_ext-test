@@ -27,32 +27,42 @@
       @delete="refreshOrganizations"
     />
 
+    <changelogDialog
+      :changelogDialog="changelogDialog"
+      :changelog="orgChangelog"
+      @update:changelogDialog="changelogDialog = $event"
+    />
+
     <organizations_table 
       ref="organizations_table"
       @edit="openEditDialog"
       @delete="openDeleteDialog" 
+      @changelog="fetchOrgChangelog"
     />
 
   </v-container>
 </template>
 
 <script>
-  //import organizations_api from "@/modules/departments/departmentsApi";
+  import OrganizationsApi from "@/modules/organizations/organizationsApi";
   import organizations_table from "@/modules/organizations/organizationsTable.vue";
   import OrganizationForm from "@/modules/organizations/organizationsForm.vue";
   import OrganizationDeleteDialog from "@/modules/organizations/organizationsDelete.vue";
+  import changelogDialog from "@/components/changelogDialog.vue";
   
   export default {
   components: {
     organizations_table,
     OrganizationForm,
     OrganizationDeleteDialog,
+    changelogDialog,
   },
   data() {
     return {
       dialog: false,
       isEditMode: false,
       deleteDialog: false,
+      changelogDialog: false,
       deleteOrganizationId: 0,
       TableOrganization: {
         id: null,
@@ -60,6 +70,7 @@
         comment: "",
       },
       organizations: [],
+      orgChangelog: [],
     };
   },
   methods: {
@@ -79,6 +90,17 @@
     openDeleteDialog(id) {
       this.deleteOrganizationId = id;
       this.deleteDialog = true;
+    },
+    fetchOrgChangelog(item) {
+      OrganizationsApi.getOrgChangelog(item.id)
+        .then((data) => {
+          this.orgChangelog = data;
+          this.changelogDialog = true;
+        })
+        .catch((err) => {
+          console.log(err);
+          this.orgChangelog = [];
+        });
     },
   },
   };

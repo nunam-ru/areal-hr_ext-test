@@ -51,4 +51,21 @@ export default {
         throw err;
       });
   },
+  getOrgChangelog(id) {
+    return api
+      .get(`/organizations/changelog/${id}`)
+      .then((response) => {
+        if (Array.isArray(response.data)) {
+          return response.data;
+        } else {
+          throw new Error("err: " + response.data);
+        }
+      })
+      .catch((err) => {
+        if (err.response && err.response.status === 401) {
+          window.location.reload();
+        }
+        throw err;
+      });
+  }
 };

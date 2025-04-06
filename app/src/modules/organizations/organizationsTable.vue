@@ -18,6 +18,9 @@
               <v-btn color="blue" @click="openEditDialog(item)" small
               >Изменить</v-btn
               >
+              <v-btn color="blue" @click="openChangelogDialog(item)" small
+              >История</v-btn
+              >
               <v-btn color="red" @click="openDeleteDialog(item.id)" small
                 >Удалить</v-btn
               >
@@ -53,6 +56,9 @@
             console.log(err)
           });
       },
+      openChangelogDialog(item) {
+      this.$emit("changelog", item);
+    },
     },
   };
   </script>

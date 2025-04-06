@@ -10,6 +10,8 @@ const {
   deletePosition,
 } = require('../controllers/positionsController')
 
+const { getChangelog, } = require('../controllers/changelogController')
+
 const positionSchema = require('../controllers/val/positionsVal')
 
 
@@ -22,6 +24,18 @@ router.get('/positions', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 })
+
+router.get('/positions/changelog/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const posChangelog = await getChangelog(3, id)
+    return res.json(posChangelog)
+  } catch (err) {
+    console.error('Error positions:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
 
 router.post('/positions', async (req, res) => {
   try {

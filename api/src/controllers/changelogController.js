@@ -9,10 +9,11 @@ async function getChangelog(object, id) {
         as changelog_date, \
         (u.last_name || ' ' || LEFT(u.first_name, 1) \
         || '. ' || left(u.third_name, 1) || '.') as full_name,\
-        changes \
+        changes->'newValue' as newValue, \
+		    changes->'oldValue' as oldValue \
         FROM changelog c \
         join users u on c.user_id = u.id \
-        where changes @> '{"object" : 1}' and changes @> '{"recordId" : $2}'\
+        where changes->'object' = $1 and changes->'record' = $2\
         order by c.id`,
       [object, id],
     )

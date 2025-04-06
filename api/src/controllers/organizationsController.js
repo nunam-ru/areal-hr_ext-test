@@ -82,7 +82,7 @@ async function updateOrganization(req, id, name, comment) {
 
     changes = { 
       "object" : 1, 
-      "record" : id,
+      "record" : parseInt(id),
       "oldValue" : oldValue,
       "newValue" : newValue
     }
