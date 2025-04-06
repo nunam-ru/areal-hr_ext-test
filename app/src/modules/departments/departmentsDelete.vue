@@ -29,7 +29,7 @@ export default {
       required: true,
     },
   },
-  emits: ["update:deleteDialog", "delete", "openSnackBar"],
+  emits: ["update:deleteDialog", "delete"],
   data() {
     return {
       localDeleteDepartmentId: this.deleteDepartmentId,
