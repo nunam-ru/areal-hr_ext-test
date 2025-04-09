@@ -136,15 +136,21 @@
         last_name: item.last_name,
         first_name: item.first_name,
         third_name: item.third_name,
-        birth_date: new Date(item.birth_date),
+        // birth_date: new Date(item.birth_date),
+        birth_date: new Date(`${item.birth_date.split('.')[2]}-\
+        ${item.birth_date.split('.')[1]}-\
+        ${item.birth_date.split('.')[0]}`),
         passport_series: item.passport_series,
         passport_number: item.passport_number,
         passport_code: item.passport_code,
         passport_by: item.passport_by,
-        passport_date: new Date(item.passport_date),
+        // passport_date: new Date(item.passport_date),
+        passport_date: new Date(`${item.passport_date.split('.')[2]}-\
+        ${item.passport_date.split('.')[1]}-\
+        ${item.passport_date.split('.')[0]}`),
         address: item.address,
-        dep_id: item.dep_id,
-        pos_id: item.pos_id,
+        dep_id: item.department_id,
+        pos_id: item.position_id,
         salary: parseFloat(item.salary.replace(/[$,]/g, "")),
       };
       this.dialog = true;

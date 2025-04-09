@@ -74,7 +74,7 @@
               title="Дата выдачи"
               locale="ru-RU"
               :max="maxDate"
-              @update:model-value="formatDate"
+              @update:model-value="formatPassDate"
               :error-messages="errors.passport_date"
               required
             >
@@ -252,6 +252,10 @@
       formatDate(value) {
         this.date = format(new Date(value), "yyyy-MM-dd");
         this.LocalEmployees.birth_date = new Date(this.date);
+      },
+      formatPassDate(value) {
+        this.date = format(new Date(value), "yyyy-MM-dd");
+        this.LocalEmployees.passport_date = new Date(this.date);
       },
       closeDialog() {
         this.errors = [];

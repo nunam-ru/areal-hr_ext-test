@@ -1,5 +1,6 @@
 const pool = require('../services/db')
-const { addChangelog } = require('./changelogController')
+const { addChangelog, compileChangelog } = require('./changelogController')
+const objectID = 1 //id organizations = 1
 
 async function getOrganizations() {
     const connection = await pool.connect()
@@ -37,12 +38,12 @@ async function addOrganization(req, name, comment) {
     const newValue = `Название: ${name}\nКомментарий: ${comment}`
 
     changes = { 
-      "object" : 1, 
+      "object" : 'organizations', 
       "record" : organizationId,
       "oldValue" : '',
       "newValue" : newValue
     }
-    await addChangelog(1, changes, connection, req)
+    await addChangelog(objectID, changes, connection, req)
 
     await connection.query('COMMIT')
     return result.rows[0]
@@ -66,27 +67,32 @@ async function updateOrganization(req, id, name, comment) {
     )
 
     const result = await connection.query(
-      'UPDATE organizations SET name = $1, comment = $2, updated_at = current_timestamp WHERE id = $3',
+      'UPDATE organizations SET name = $1, \
+      comment = $2, \
+      updated_at = current_timestamp WHERE id = $3',
       [name, comment, id],
     )
     let oldValue = ''
     let newValue = ''
-    if (oldDataResult.rows[0].name != name) {
-      oldValue += `Название: ${oldDataResult.rows[0].name}\n`
-      newValue += `Название: ${name}\n`
-    }
-    if (oldDataResult.rows[0].comment != comment) {
-      oldValue += `Комментарий: ${oldDataResult.rows[0].comment}\n`
-      newValue += `Комментарий: ${comment}\n`
-    }
+    let changelogData = {oldValue, newValue}
+
+    changelogData = await compileChangelog(
+      true, 'Название', changelogData,
+      oldDataResult.rows[0].name, name
+    )
+
+    changelogData = await compileChangelog(
+      true, 'Комментарий', changelogData,
+      oldDataResult.rows[0].comment, comment
+    )
 
     changes = { 
-      "object" : 1, 
+      "object" : 'organizations', 
       "record" : parseInt(id),
-      "oldValue" : oldValue,
-      "newValue" : newValue
+      "oldValue" : changelogData.oldValue,
+      "newValue" : changelogData.newValue
     }
-    await addChangelog(1, changes, connection, req)
+    await addChangelog(objectID, changes, connection, req)
 
     await connection.query('COMMIT')
     return result.rows[0]

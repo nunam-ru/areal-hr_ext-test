@@ -1,5 +1,6 @@
 const pool = require('../services/db')
-const { addChangelog } = require('./changelogController')
+const { addChangelog, compileChangelog } = require('./changelogController')
+const objectID = 2 //id departments = 2
 
 async function getDepartments() {
     const connection = await pool.connect()
@@ -63,12 +64,12 @@ async function addDepartment(req, name, comment, parent_id, org_id) {
     const departmentId = result.rows[0].id
 
     changes = { 
-      "object" : 2, 
+      "object" : `departments`, 
       "record" : departmentId,
       "oldValue" : '',
       "newValue" : newValue
     }
-    await addChangelog(2, changes, connection, req)
+    await addChangelog(objectID, changes, connection, req)
 
     await connection.query('COMMIT')
     return result.rows[0]
@@ -96,6 +97,7 @@ async function updateDepartment(
     let parent
     let newValue = ''
     let oldValue = ''
+    let changelogData = {oldValue, newValue}
     let changes = {}
     const oldDataResult = await connection.query(
       'SELECT d.name AS department_name, \
@@ -112,15 +114,14 @@ async function updateDepartment(
       'SELECT name FROM organizations WHERE id = $1',
       [org_id],
     )
-
-    if (oldDataResult.rows[0].department_name != name) {
-      oldValue += `Название: ${oldDataResult.rows[0].department_name}\n`
-      newValue += `Название: ${name}\n`
-    }
-    if (oldDataResult.rows[0].department_comment != comment) {
-      oldValue += `Комментарий: ${oldDataResult.rows[0].department_comment}\n`
-      newValue += `Комментарий: ${comment}\n`
-    }
+    
+    changelogData = await compileChangelog(
+      true, 'Название', changelogData, 
+      oldDataResult.rows[0].department_name, name)
+    
+    changelogData = await compileChangelog(
+      true, 'Комментарий', changelogData, 
+      oldDataResult.rows[0].department_comment, comment)
 
     if (parent_id) {
       query = `UPDATE departments 
@@ -131,20 +132,23 @@ async function updateDepartment(
         'SELECT name FROM departments WHERE id = $1',
         [parent_id],
       )
-      if (oldDataResult.rows[0].parent_department_name != parent.rows[0].name) {
-        oldValue += `Родитель: ${oldDataResult.rows[0].parent_department_name}\n`
-        newValue += `Родитель: ${parent.rows[0].name}\n`
-      }
+
+      changelogData = await compileChangelog(
+        true, 'Родитель', changelogData, 
+        oldDataResult.rows[0].parent_department_name, parent.rows[0].name)
+
+
     } else {
       query = `UPDATE departments 
                 SET name = $1, comment = $2, parent_id = NULL, org_id = $3, updated_at = current_timestamp
                 WHERE id = $4 RETURNING *`
       values = [name, comment, org_id, id]
     }
-    if (oldDataResult.rows[0].organization_name != organization.rows[0].name) {
-      oldValue += `Организация: ${oldDataResult.rows[0].organization_name}\n`
-      newValue += `Организация: ${organization.rows[0].name}\n`
-    }
+    
+    changelogData = await compileChangelog(
+      true, 'Организация', changelogData, 
+      oldDataResult.rows[0].organization_name, organization.rows[0].name)
+
     const result = await connection.query(query, values)
 
     await connection.query(
@@ -156,12 +160,12 @@ async function updateDepartment(
     )
 
     changes = { 
-      "object" : 2, 
+      "object" : 'departments', 
       "record" : parseInt(id),
-      "oldValue" : oldValue,
-      "newValue" : newValue
+      "oldValue" : changelogData.oldValue,
+      "newValue" : changelogData.newValue
     }
-    await addChangelog(2, changes, connection, req)
+    await addChangelog(objectID, changes, connection, req)
 
     await connection.query('COMMIT')
     return result.rows[0]

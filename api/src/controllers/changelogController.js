@@ -13,7 +13,7 @@ async function getChangelog(object, id) {
 		    changes->'oldValue' as oldValue \
         FROM changelog c \
         join users u on c.user_id = u.id \
-        where changes->'object' = $1 and changes->'record' = $2\
+        where object = $1 and changes->'record' = $2\
         order by c.id`,
       [object, id],
     )
@@ -55,7 +55,26 @@ async function addChangelog(
   }
 }
 
+async function compileChangelog(isUpdate, dataType, changelogData, oldData, newData){
+  try {
+    if (isUpdate === true) {
+      if (oldData != newData) {
+        changelogData.oldValue += `${dataType}: ${oldData}\n`
+        changelogData.newValue += `${dataType}: ${newData}\n`
+      }
+    }
+    else {
+      changelogData.newValue += `${dataType}: ${newData}\n`
+    }
+    return changelogData
+  }
+  catch(err) {
+    console.log(err)
+  }
+}
+
 module.exports = {
     getChangelog,
     addChangelog,
+    compileChangelog,
 }

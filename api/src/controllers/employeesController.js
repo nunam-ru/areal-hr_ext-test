@@ -1,5 +1,6 @@
 const pool = require('../services/db')
-const { addChangelog } = require('./changelogController')
+const { addChangelog, compileChangelog } = require('./changelogController')
+const objectID = 4 //id employees = 4
 
 function nullToEmpty(value) {
   if (value === null || value === undefined) {
@@ -102,6 +103,7 @@ async function addEmployee(
     )
 
     const dob_format = birth_date.toISOString().split('T')[0]
+    
     const newValue = `Фамилия: ${last_name}\n
     Имя: ${first_name}\n
     Отчество: ${nullToEmpty(third_name)}\n
@@ -118,12 +120,12 @@ async function addEmployee(
     Статус: Работает`
 
     changes = { 
-      "object" : 4, 
+      "object" : 'employees', 
       "record" : parseInt(employeeId),
       "oldValue" : '',
       "newValue" : newValue
     }
-    await addChangelog(4, changes, connection, req)
+    await addChangelog(objectID, changes, connection, req)
 
     await connection.query('COMMIT')
     return employeeId
@@ -165,7 +167,7 @@ async function updateEmployee(
         e.passport_number, \
         e.passport_code, \
         e.passport_by, \
-        e.passport_date, \
+        TO_CHAR(e.passport_date, 'dd.MM.yyyy') AS passport_date, \
         e.address, \
         d.id as department_id, \
         d.name AS department_name, \
@@ -227,67 +229,49 @@ async function updateEmployee(
       'SELECT name FROM positions WHERE id = $1',
       [pos_id],
     )
-    const dob_format = birth_date.toISOString().split('T')[0]
+
+    //const dob_format = birth_date.toISOString().split('T')[0]
+    const dob_format = birth_date.toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
+    //const passport_date_format = passport_date.toISOString().split('T')[0]
+    const passport_date_format = passport_date.toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
 
     let oldValue = ''
     let newValue = ''
+    let changelogData = {oldValue, newValue}
+    let dep_name = department.rows[0].name
+    let pos_name = position.rows[0].name
+    let newData = {
+      last_name, 
+      first_name, 
+      third_name, 
+      dob_format, 
+      passport_series, 
+      passport_number, 
+      passport_code, 
+      passport_by, 
+      passport_date_format, 
+      dep_name, 
+      pos_name,
+      salary
+    }
 
-    if (oldDataResult.rows[0].last_name != last_name) {
-      oldValue += `Фамилия: ${oldDataResult.rows[0].last_name}\n`
-      newValue += `Фамилия: ${last_name}\n`
-    }
-    if (oldDataResult.rows[0].first_name != first_name) {
-      oldValue += `Имя: ${oldDataResult.rows[0].first_name}\n`
-      newValue += `Имя: ${first_name}\n`
-    }
-    if (oldDataResult.rows[0].third_name != third_name) {
-      oldValue += `Отчество: ${oldDataResult.rows[0].third_name}\n`
-      newValue += `Отчество: ${third_name}\n`
-    }
-    if (oldDataResult.rows[0].birth_date != dob_format) {
-      oldValue += `Дата рождения: ${oldDataResult.rows[0].birth_date}\n`
-      newValue += `Дата рождения: ${dob_format}\n`
-    }
-    if (oldDataResult.rows[0].passport_series != passport_series) {
-      oldValue += `Серия: ${oldDataResult.rows[0].passport_series}\n`
-      newValue += `Серия: ${passport_series}\n`
-    }
-    if (oldDataResult.rows[0].passport_number != passport_number) {
-      oldValue += `Номер паспорта: ${oldDataResult.rows[0].passport_number}\n`
-      newValue += `Номер паспорта: ${passport_number}\n`
-    }
-    if (oldDataResult.rows[0].passport_code != passport_code) {
-      oldValue += `Код подразделения: ${oldDataResult.rows[0].passport_code}\n`
-      newValue += `Код подразделения: ${passport_code}\n`
-    }
-    if (oldDataResult.rows[0].passport_by != passport_by) {
-      oldValue += `Код подразделения: ${oldDataResult.rows[0].passport_by}\n`
-      newValue += `Код подразделения: ${passport_by}\n`
-    }
-    if (oldDataResult.rows[0].passport_date != passport_date) {
-      oldValue += `Код подразделения: ${oldDataResult.rows[0].passport_date}\n`
-      newValue += `Код подразделения: ${passport_date}\n`
-    }
-    if (oldDataResult.rows[0].department_name != department.rows[0].name) {
-      oldValue += `Отдел: ${oldDataResult.rows[0].department_name}\n`
-      newValue += `Отдел: ${department.rows[0].name}\n`
-    }
-    if (oldDataResult.rows[0].position_name != position.rows[0].name) {
-      oldValue += `Должность: ${oldDataResult.rows[0].position_name}\n`
-      newValue += `Должность: ${position.rows[0].name}\n`
-    }
-    if (oldDataResult.rows[0].salary != salary) {
-      oldValue += `Зарплата: ${oldDataResult.rows[0].salary}\n`
-      newValue += `Зарплата: ${salary}\n`
-    }
+    changelogData = await compileEmpChangelog(oldDataResult, newData, changelogData)
 
     changes = { 
-      "object" : 4, 
+      "object" : 'employees', 
       "record" : parseInt(emp_id),
-      "oldValue" : oldValue,
-      "newValue" : newValue
+      "oldValue" : changelogData.oldValue,
+      "newValue" : changelogData.newValue
     }
-    await addChangelog(4, changes, connection, req)
+    await addChangelog(objectID, changes, connection, req)
 
     await connection.query('COMMIT')
     return 'Employee data successfully updated'
@@ -320,12 +304,12 @@ async function deleteEmployee(req, id) {
     const newValue = `Статус: Уволен`
 
     changes = { 
-      "object" : 4, 
+      "object" : 'employees', 
       "record" : parseInt(id),
       "oldValue" : oldValue,
       "newValue" : newValue
     }
-    await addChangelog(4, changes, connection, req)
+    await addChangelog(objectID, changes, connection, req)
 
     await connection.query('COMMIT')
     return 'Employee terminated successfully'
@@ -337,7 +321,64 @@ async function deleteEmployee(req, id) {
   }
 }
 
-  module.exports = {
+async function compileEmpChangelog(oldDataResult, newData, changelogData) {
+  try {
+    if (oldDataResult.rows[0].last_name != newData.last_name) {
+      changelogData.oldValue += `Фамилия: ${oldDataResult.rows[0].last_name}\n`
+      changelogData.newValue += `Фамилия: ${newData.last_name}\n`
+    }
+    if (oldDataResult.rows[0].first_name != newData.first_name) {
+      changelogData.oldValue += `Имя: ${oldDataResult.rows[0].first_name}\n`
+      changelogData.newValue += `Имя: ${newData.first_name}\n`
+    }
+    if (oldDataResult.rows[0].third_name != newData.third_name) {
+      changelogData.oldValue += `Отчество: ${oldDataResult.rows[0].third_name}\n`
+      changelogData.newValue += `Отчество: ${newData.third_name}\n`
+    }
+    if (oldDataResult.rows[0].birth_date != newData.dob_format) {
+      changelogData.oldValue += `Дата рождения: ${oldDataResult.rows[0].birth_date}\n`
+      changelogData.newValue += `Дата рождения: ${newData.dob_format}\n`
+    }
+    if (oldDataResult.rows[0].passport_series != newData.passport_series) {
+      changelogData.oldValue += `Серия: ${oldDataResult.rows[0].passport_series}\n`
+      changelogData.newValue += `Серия: ${newData.passport_series}\n`
+    }
+    if (oldDataResult.rows[0].passport_number != newData.passport_number) {
+      changelogData.oldValue += `Номер паспорта: ${oldDataResult.rows[0].passport_number}\n`
+      changelogData.newValue += `Номер паспорта: ${newData.passport_number}\n`
+    }
+    if (oldDataResult.rows[0].passport_code != newData.passport_code) {
+      changelogData.oldValue += `Код подразделения: ${oldDataResult.rows[0].passport_code}\n`
+      changelogData.newValue += `Код подразделения: ${newData.passport_code}\n`
+    }
+    if (oldDataResult.rows[0].passport_by != newData.passport_by) {
+      changelogData.oldValue += `Кем выдан: ${oldDataResult.rows[0].passport_by}\n`
+      changelogData.newValue += `Кем выдан: ${newData.passport_by}\n`
+    }
+    if (oldDataResult.rows[0].passport_date != newData.passport_date_format) {
+      changelogData.oldValue += `Дата выдачи: ${oldDataResult.rows[0].passport_date}\n`
+      changelogData.newValue += `Дата выдачи: ${newData.passport_date_format}\n`
+    }
+    if (oldDataResult.rows[0].department_name != newData.dep_name) {
+      changelogData.oldValue += `Отдел: ${oldDataResult.rows[0].department_name}\n`
+      changelogData.newValue += `Отдел: ${newData.dep_name}\n`
+    }
+    if (oldDataResult.rows[0].position_name != newData.pos_name) {
+      changelogData.oldValue += `Должность: ${oldDataResult.rows[0].position_name}\n`
+      changelogData.newValue += `Должность: ${newData.pos_name}\n`
+    }
+    if (oldDataResult.rows[0].salary != newData.salary) {
+      changelogData.oldValue += `Зарплата: ${oldDataResult.rows[0].salary}\n`
+      changelogData.newValue += `Зарплата: ${newData.salary}\n`
+    }
+    return changelogData
+  }
+  catch(err) {
+    console.log(err)
+  }
+}
+
+module.exports = {
     getEmployees,
     addEmployee,
     updateEmployee,

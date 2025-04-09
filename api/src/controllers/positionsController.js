@@ -1,5 +1,6 @@
 const pool = require('../services/db')
-const { addChangelog } = require('./changelogController')
+const { addChangelog, compileChangelog } = require('./changelogController')
+const objectID = 3 //id positions = 3
 
 async function getPositions() {
     const connection = await pool.connect()
@@ -42,12 +43,12 @@ async function addPosition(req, name, dep_id) {
     const newValue = `Название: ${name}\nОтдел: ${department.rows[0].name}`
 
     changes = { 
-      "object" : 3, 
+      "object" : 'positions', 
       "record" : positionId,
       "oldValue" : '',
       "newValue" : newValue
     }
-    await addChangelog(3, changes, connection, req)
+    await addChangelog(objectID, changes, connection, req)
 
     await connection.query('COMMIT')
     return result.rows[0]
@@ -83,22 +84,25 @@ async function updatePosition(req, id, name, dep_id) {
     )
     let oldValue = ''
     let newValue = ''
-    if (oldDataResult.rows[0].positions_name != name) {
-      oldValue += `Название: ${oldDataResult.rows[0].positions_name}\n`
-      newValue += `Название: ${name}\n`
-    }
-    if (oldDataResult.rows[0].departments_name != department.rows[0].name) {
-      oldValue += `Отдел: ${oldDataResult.rows[0].departments_name}\n`
-      newValue += `Отдел: ${department.rows[0].name}\n`
-    }
+    let changelogData = {oldValue, newValue}
 
+    changelogData = await compileChangelog(
+      true, 'Название', changelogData,
+      oldDataResult.rows[0].positions_name, name
+    )
+
+    changelogData = await compileChangelog(
+      true, 'Отдел', changelogData,
+      oldDataResult.rows[0].departments_name, department.rows[0].name
+    )
+    
     changes = { 
-      "object" : 3, 
+      "object" : `positions`, 
       "record" : parseInt(id),
-      "oldValue" : oldValue,
-      "newValue" : newValue
+      "oldValue" : changelogData.oldValue,
+      "newValue" : changelogData.newValue
     }
-    await addChangelog(3, changes, connection, req)
+    await addChangelog(objectID, changes, connection, req)
 
     await connection.query('COMMIT')
     return result.rows[0]

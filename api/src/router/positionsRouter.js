@@ -3,6 +3,8 @@ const router = express.Router()
 const pool = require('../services/db')
 const { StatusCodes } = require('http-status-codes')
 
+const objectID = 3 //id positions = 3
+
 const {
   getPositions,
   addPosition,
@@ -28,7 +30,7 @@ router.get('/positions', async (req, res) => {
 router.get('/positions/changelog/:id', async (req, res) => {
   try {
     const { id } = req.params
-    const posChangelog = await getChangelog(3, id)
+    const posChangelog = await getChangelog(objectID, id)
     return res.json(posChangelog)
   } catch (err) {
     console.error('Error positions:', err);

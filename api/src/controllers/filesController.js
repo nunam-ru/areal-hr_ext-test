@@ -1,5 +1,6 @@
 const pool = require('../services/db')
 const path = require('path')
+const objectID = 4 //id employees = 4
 
 const { addChangelog } = require('./changelogController')
 
@@ -70,12 +71,12 @@ async function addFile(req, emp_id, file, connection) {
     const newValue = `Добавлен файл ${fileName}`
 
     changes = { 
-        "object" : 4, 
+        "object" : 'employees', 
         "record" : parseInt(emp_id),
         "oldValue" : '',
         "newValue" : newValue
     }
-    await addChangelog(4, changes, connection, req)
+    await addChangelog(objectID, changes, connection, req)
 
     await connection.query('COMMIT')
     return result.rows[0]
@@ -100,12 +101,12 @@ async function deleteFile(req, fileId, connection) {
     const newValue = `Удален файл ${oldDataResult.rows[0].name}`
 
     changes = { 
-        "object" : 4, 
+        "object" : 'employees', 
         "record" : parseInt(oldDataResult.rows[0].emp_id),
         "oldValue" : '',
         "newValue" : newValue
     }
-    await addChangelog(4, changes, connection, req)
+    await addChangelog(objectID, changes, connection, req)
 
     await connection.query('COMMIT')
     return result.rowCount

@@ -71,6 +71,7 @@
   <style scoped>
   td, th {
     max-width: 150px;
+    font-size: 1em;
   }
 
   th {

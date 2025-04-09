@@ -3,6 +3,8 @@ const router = express.Router()
 const pool = require('../services/db')
 const { StatusCodes } = require('http-status-codes')
 
+const objectID = 2 //id departments = 2
+
 const {
   getDepartments,
   addDepartment,
@@ -27,7 +29,7 @@ router.get('/departments', async (req, res) => {
 router.get('/departments/changelog/:id', async (req, res) => {
   try {
     const { id } = req.params
-    const depChangelog = await getChangelog(2, id)
+    const depChangelog = await getChangelog(objectID, id)
     return res.json(depChangelog)
   } catch (err) {
     console.error('Error departments:', err);

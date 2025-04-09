@@ -4,6 +4,8 @@ const pool = require('../services/db')
 const { StatusCodes } = require('http-status-codes')
 const multer = require('multer')
 
+const objectID = 4 //id employees = 4
+
 const {
   getEmployees,
   addEmployee,
@@ -32,7 +34,7 @@ router.get('/employees', async (req, res) => {
 router.get('/employees/changelog/:id', async (req, res) => {
   try {
     const { id } = req.params
-    const empChangelog = await getChangelog(4, id)
+    const empChangelog = await getChangelog(objectID, id)
     return res.json(empChangelog)
   } catch (err) {
     console.error('Error employees:', err);

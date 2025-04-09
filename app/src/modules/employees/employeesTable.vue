@@ -8,8 +8,7 @@
           <th>Отчество</th>
           <th>Дата рождения</th>
           <th>Адрес</th>
-          <th>Паспорт серия</th>
-          <th>Номер</th>
+          <th>Паспорт</th>
           <th></th>
           <th></th>
         </tr>
@@ -22,8 +21,7 @@
           <td>{{ item.third_name }}</td>
           <td>{{ item.birth_date }}</td>
           <td>{{ item.address }}</td>
-          <td>{{ item.passport_series }}</td>
-          <td>{{ item.passport_number }}</td>
+          <td>{{ item.passport_series +' '+ item.passport_number}}</td>
           <td class="fired_str">
             {{ item.fired == null ? "" : "Уволен" }}
           </td>
@@ -107,6 +105,7 @@
   <style scoped>
   td, th {
     max-width: 200px;
+    font-size: 1em;
   }
 
   th {
@@ -123,6 +122,10 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 4px;
   padding: 10% 0;
+  }
+
+  :deep(.v-btn__content) {
+    font-size: .6em;
   }
   </style>
   
