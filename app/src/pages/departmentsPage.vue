@@ -30,7 +30,8 @@
 
     <DepartmentDeleteDialog
       :deleteDialog="deleteDialog"
-      :deleteDepartmentId="deleteDepartmentId"
+      :deleteId="deleteDepartmentId"
+      @apply-delete="deleteRecord(deleteDepartmentId)"
       @update:deleteDialog="deleteDialog = $event"
       @delete="refreshDepartments"
     />
@@ -48,13 +49,21 @@
       @changelog="fetchDepChangelog"
     />
   </v-container>
+  <div class="pageContent">
+    <v-pagination 
+    v-model="pagination.page"
+    :length="pagination.pages"
+    :total-visible="5"
+    :page="pagination.page"
+    @input="nextPage"></v-pagination>
+    </div>
 </template>
 
 <script>
   import DepartmentsApi from "@/modules/departments/departmentsApi";
   import departmentsTable from "@/modules/departments/departmentsTable.vue";
   import DepartmentForm from "@/modules/departments/departmentsForm.vue";
-  import DepartmentDeleteDialog from "@/modules/departments/departmentsDelete.vue";
+  import DepartmentDeleteDialog from "@/components/deleteDialog.vue";
   import changelogDialog from "@/components/changelogDialog.vue";
 
   export default {
@@ -81,14 +90,46 @@
       departments: [],
       depChangelog: [],
       isAddMode: false,
+      pagination: {
+        page: 1,
+        pages: 0,
+        itemsPerPage: 10,
+      },
     };
   },
+  created() {
+    this.getDepPages();
+  },
+  mounted() {
+      this.$refs.departmentsTable.fetchDepartmentsPage(this.$route.query.page);
+      this.pagination.page = !parseInt(this.$route.query.page) ? this.pagination.page : parseInt(this.$route.query.page)
+  },
+  watch: {
+    "pagination.page": function(value) {
+      this.$router.push({path: this.$route.fullPath, query: {page: value} })
+      this.$refs.departmentsTable.fetchDepartmentsPage(value);
+      this.page = value;
+    }
+  }, 
   methods: {
+    getDepPages() {
+      DepartmentsApi.getDepPages().then((data) => {
+          this.pagination.pages = Math.ceil(parseInt(data[0]['count']) / this.pagination.itemsPerPage);
+          }).catch((err) => {
+            console.log(err)
+      });
+    },
+    nextPage(value){
+      this.$router.push({path: this.$route.fullPath, query: {page: value} })
+      this.$refs.departmentsTable.fetchDepartmentsPage(value);
+      this.page = value;
+    },
     handleUpdateDepartments(departments) {
       this.departments = departments;
     },
     refreshDepartments() {
-      this.$refs.departmentsTable.fetchDepartments();
+      //this.$refs.departmentsTable.fetchDepartments();
+      this.$refs.departmentsTable.fetchDepartmentsPage(this.$route.query.page);
     },
     openAddDialog(isSubDepartmentMode) {
       this.isAddMode = true;
@@ -122,12 +163,11 @@
           this.depChangelog = [];
         });
     },
+    deleteRecord(item_id) {
+      DepartmentsApi.deleteDepartment(item_id).then(
+        () => this.$refs.departmentsTable.fetchDepartmentsPage(this.$route.query.page)
+      )
+    },
   },
   };
 </script>
-
-<style lang="scss">
-  .action_button{
-    margin: 0 1%
-  }
-</style>

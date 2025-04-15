@@ -11,6 +11,7 @@ const {
   addEmployee,
   updateEmployee,
   deleteEmployee,
+  countEmpRecords,
 } = require('../controllers/employeesController')
 
 const { getChangelog, } = require('../controllers/changelogController')
@@ -23,8 +24,19 @@ const upload = multer({ storage: storage })
 
 router.get('/employees', async (req, res) => {
   try {
-    const employees = await getEmployees()
+    const { page = 1 } = req.query;
+    const employees = await getEmployees(page)
     return res.json(employees)
+  } catch (err) {
+    console.error('Error employees:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
+router.get('/employees/pages', async (req, res) => {
+  try {
+    const pages = await countEmpRecords()
+    return res.json(pages)
   } catch (err) {
     console.error('Error employees:', err);
     res.status(500).json({ error: 'Internal server error' });

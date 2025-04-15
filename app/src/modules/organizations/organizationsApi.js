@@ -1,9 +1,20 @@
 import api from "@/shared/api/axios";
 
 export default {
-  getOrganizations() {
+  getOrgPages() {
     return api
-      .get("/organizations")
+      .get("/organizations/pages")
+      .then((response) => response.data)
+      .catch((err) => {
+        if (err.response && err.response.status === 401) {
+          window.location.reload();
+        }
+        throw err;
+      });
+  },
+  getOrganizations(pageID) {
+    return api
+      .get("/organizations", {params: {page: pageID}})
       .then((response) => response.data)
       .catch((err) => {
         if (err.response && err.response.status === 401) {

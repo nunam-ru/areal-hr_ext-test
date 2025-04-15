@@ -22,7 +22,8 @@
 
     <OrganizationDeleteDialog
       :deleteDialog="deleteDialog"
-      :deleteOrganizationId="deleteOrganizationId"
+      :deleteId="deleteOrganizationId"
+      @apply-delete="deleteRecord(deleteOrganizationId)"
       @update:deleteDialog="deleteDialog = $event"
       @delete="refreshOrganizations"
     />
@@ -32,25 +33,34 @@
       :changelog="orgChangelog"
       @update:changelogDialog="changelogDialog = $event"
     />
-
+    
     <organizations_table 
       ref="organizations_table"
       @edit="openEditDialog"
       @delete="openDeleteDialog" 
       @changelog="fetchOrgChangelog"
     />
-
   </v-container>
+  <div class="pageContent">
+    <v-pagination 
+    v-model="pagination.page"
+    :length="pagination.pages"
+    :total-visible="5"
+    :page="pagination.page"
+    @input="nextPage"></v-pagination>
+    </div>
 </template>
 
 <script>
   import OrganizationsApi from "@/modules/organizations/organizationsApi";
   import organizations_table from "@/modules/organizations/organizationsTable.vue";
   import OrganizationForm from "@/modules/organizations/organizationsForm.vue";
-  import OrganizationDeleteDialog from "@/modules/organizations/organizationsDelete.vue";
+  //import OrganizationDeleteDialog from "@/modules/organizations/organizationsDelete.vue";
   import changelogDialog from "@/components/changelogDialog.vue";
+  import OrganizationDeleteDialog from "@/components/deleteDialog.vue";
   
   export default {
+  inheritAttrs: false,
   components: {
     organizations_table,
     OrganizationForm,
@@ -71,11 +81,42 @@
       },
       organizations: [],
       orgChangelog: [],
-    };
+      pagination: {
+        page: 1,
+        pages: 0,
+        itemsPerPage: 10,
+      },
+    }; 
   },
+  created() {
+    this.getOrgPages();
+  },
+  mounted() {
+      this.$refs.organizations_table.fetchOrganizationsPage(this.$route.query.page);
+      this.pagination.page = !parseInt(this.$route.query.page) ? this.pagination.page : parseInt(this.$route.query.page)
+  },
+  watch: {
+    "pagination.page": function(value) {
+      this.$router.push({path: this.$route.fullPath, query: {page: value} })
+      this.$refs.organizations_table.fetchOrganizationsPage(value);
+      this.page = value;
+    }
+  }, 
   methods: {
+    getOrgPages() {
+      OrganizationsApi.getOrgPages().then((data) => {
+          this.pagination.pages = Math.ceil(parseInt(data[0]['count']) / this.pagination.itemsPerPage);
+          }).catch((err) => {
+            console.log(err)
+      });
+    },
+    nextPage(value){
+      this.$router.push({path: this.$route.fullPath, query: {page: value} })
+      this.$refs.organizations_table.fetchOrganizationsPage(value);
+      this.page = value;
+    },
     refreshOrganizations() {
-      this.$refs.organizations_table.fetchOrganizations();
+      this.$refs.organizations_table.fetchOrganizationsPage(this.$route.query.page);
     },
     openAddDialog() {
       this.isEditMode = false;
@@ -102,6 +143,12 @@
           this.orgChangelog = [];
         });
     },
+    deleteRecord(item_id) {
+        OrganizationsApi.deleteOrganization(item_id).then(
+          () => this.$refs.organizations_table.fetchOrganizationsPage(this.$route.query.page)
+        )
+    },
+    
   },
   };
 </script>

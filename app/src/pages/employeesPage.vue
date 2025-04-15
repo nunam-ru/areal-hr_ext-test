@@ -20,7 +20,8 @@
 
     <EmployeesDeleteDialog
       :deleteDialog="deleteDialog"
-      :TableEmployees="TableEmployees"
+      :deleteId="deleteEmployeeId"
+      @apply-delete="deleteRecord(deleteEmployeeId)"
       @update:deleteDialog="deleteDialog = $event"
       @delete="refreshEmployees"
     />
@@ -54,6 +55,14 @@
 
 
   </v-container>
+  <div class="pageContent">
+    <v-pagination 
+    v-model="pagination.page"
+    :length="pagination.pages"
+    :total-visible="5"
+    :page="pagination.page"
+    @input="nextPage"></v-pagination>
+    </div>
 </template>
 
 <script>
@@ -61,7 +70,7 @@
   import employees_table from "@/modules/employees/employeesTable.vue";
   import EmployeesForm from "@/modules/employees/employeesForm.vue";
   import changelogDialog from "@/components/changelogDialog.vue";
-  import EmployeesDeleteDialog from "@/modules/employees/employeesDelete.vue"
+  import EmployeesDeleteDialog from "@/components/deleteDialog.vue"
   import EmployeesDetailsDialog from "@/modules/employees/employeesDetails.vue"
   import EmployeesFilesDialog from "@/modules/employees/employeesFiles.vue"
 
@@ -100,12 +109,45 @@
         pos_id: null,
         salary: null,
       },
+      deleteEmployeeId: 0,
       empChangelog: [],
+      pagination: {
+        page: 1,
+        pages: 0,
+        itemsPerPage: 10,
+      },
     };
   },
+  created() {
+    this.getEmpPages();
+  },
+  mounted() {
+      this.$refs.employees_table.fetchEmployeesPage(this.$route.query.page);
+      this.pagination.page = !parseInt(this.$route.query.page) ? this.pagination.page : parseInt(this.$route.query.page)
+  },
+  watch: {
+    "pagination.page": function(value) {
+      this.$router.push({path: this.$route.fullPath, query: {page: value} })
+      this.$refs.employees_table.fetchEmployeesPage(value);
+      this.page = value;
+    }
+  }, 
   methods: {
+    getEmpPages() {
+      employeesApi.getEmpPages().then((data) => {
+          this.pagination.pages = Math.ceil(parseInt(data[0]['count']) / this.pagination.itemsPerPage);
+          }).catch((err) => {
+            console.log(err)
+      });
+    },
+    nextPage(value){
+      this.$router.push({path: this.$route.fullPath, query: {page: value} })
+      this.$refs.employees_table.fetchEmployeesPage(value);
+      this.page = value;
+    },
     refreshEmployees() {
-      this.$refs.employees_table.fetchEmployees();
+      //this.$refs.employees_table.fetchEmployees();
+      this.$refs.employees_table.fetchEmployeesPage(this.$route.query.page);
     },
     openAddDialog() {
       this.isEditMode = false;
@@ -160,7 +202,8 @@
       this.detailsDialog = true;
     },
     openDeleteDialog(item) {
-      this.TableEmployees = item;
+      //this.TableEmployees = item;
+      this.deleteEmployeeId = item.id
       this.deleteDialog = true;
     },
     openFilesDialog(item) {
@@ -178,6 +221,11 @@
           console.log(err)
           this.empChangelog = [];
         });
+    },
+    deleteRecord(item_id) {
+      employeesApi.deleteEmployee(item_id).then(
+        () => this.$refs.employees_table.fetchEmployeesPage(this.$route.query.page)
+      )
     },
   },
   };

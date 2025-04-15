@@ -9,32 +9,54 @@ function nullToEmpty(value) {
   return value
 }
 
-async function getEmployees() {
-    const connection = await pool.connect()
+async function getEmployees(page = 1) {
+  const connection = await pool.connect()
+  try {
+    if (!parseInt(page)) {
+      page = 1
+    }
+    await connection.query('BEGIN')
+    const result = await connection.query(
+      "SELECT e.id, \
+        e.last_name, \
+        e.first_name, \
+        e.third_name, \
+        TO_CHAR(e.birth_date, 'dd.MM.yyyy') AS birth_date, \
+        e.passport_series, \
+        e.passport_number, \
+        e.passport_code, \
+        e.passport_by, \
+        TO_CHAR(e.passport_date, 'dd.MM.yyyy') as passport_date, \
+        e.address, \
+        d.id as department_id, \
+        d.name AS department_name, \
+        p.id as position_id, \
+        p.name AS position_name, \
+        hr.salary, \
+        hr.deleted_at as fired \
+        FROM employees e \
+        JOIN hr_operations hr on e.id = hr.emp_id \
+        join departments d on hr.dep_id = d.id \
+        join positions p on hr.pos_id = p.id \
+        ORDER BY e.id\
+        LIMIT 10 OFFSET ($1-1)*10;",
+      [page]
+    )
+    return result.rows
+  } catch (err) {
+    console.log(err)
+  } finally {
+    connection.release()
+  }
+}
+
+async function countEmpRecords() {
+  const connection = await pool.connect()
     try {
+      await connection.query('BEGIN')
       const result = await connection.query(
-        "SELECT e.id, \
-          e.last_name, \
-          e.first_name, \
-          e.third_name, \
-          TO_CHAR(e.birth_date, 'dd.MM.yyyy') AS birth_date, \
-          e.passport_series, \
-          e.passport_number, \
-          e.passport_code, \
-          e.passport_by, \
-          TO_CHAR(e.passport_date, 'dd.MM.yyyy') as passport_date, \
-          e.address, \
-          d.id as department_id, \
-          d.name AS department_name, \
-          p.id as position_id, \
-          p.name AS position_name, \
-          hr.salary, \
-          hr.deleted_at as fired \
-          FROM employees e \
-          JOIN hr_operations hr on e.id = hr.emp_id \
-          join departments d on hr.dep_id = d.id \
-          join positions p on hr.pos_id = p.id \
-          ORDER BY e.id",
+        "SELECT COUNT(id) FROM employees\
+         WHERE deleted_at IS NULL",
       )
       return result.rows
     } catch (err) {
@@ -42,7 +64,7 @@ async function getEmployees() {
     } finally {
       connection.release()
     }
-  }
+}
 
 async function addEmployee(
   req,
@@ -295,7 +317,7 @@ async function deleteEmployee(req, id) {
     await connection.query(
       `UPDATE hr_operations
         SET deleted_at = current_timestamp
-        WHERE id = $1`,
+        WHERE emp_id = $1`,
       [id],
     )
 
@@ -383,4 +405,5 @@ module.exports = {
     addEmployee,
     updateEmployee,
     deleteEmployee,
+    countEmpRecords,
   }

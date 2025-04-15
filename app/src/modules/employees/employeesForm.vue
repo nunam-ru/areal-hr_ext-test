@@ -322,9 +322,4 @@
     },
   };
   </script>
-  <style scoped>
-  .error-text {
-    color: #b00020;
-  }
-  </style>
   

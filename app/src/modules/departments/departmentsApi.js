@@ -1,9 +1,20 @@
 import api from "@/shared/api/axios";
 
 export default {
-  getDepartments() {
+  getDepPages() {
     return api
-      .get("/departments")
+      .get("/departments/pages")
+      .then((response) => response.data)
+      .catch((err) => {
+        if (err.response && err.response.status === 401) {
+          window.location.reload();
+        }
+        throw err;
+      });
+  },
+  getDepartments(pageID) {
+    return api
+      .get("/departments", {params: {page: pageID}})
       .then((response) => response.data)
       .catch((err) => {
         if (err.response && err.response.status === 401) {

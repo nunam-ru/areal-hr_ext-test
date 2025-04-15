@@ -44,13 +44,4 @@
   };
   </script>
 
-  <style scoped>
-  td, th {
-    max-width: 150px;
-  }
-
-  th {
-    background-color: rgb(238, 238, 238);
-  }
-  </style>
   

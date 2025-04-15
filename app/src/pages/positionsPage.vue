@@ -21,7 +21,8 @@
 
     <PositionDeleteDialog
       :deleteDialog="deleteDialog"
-      :deletePositionId="deletePositionId"
+      :deleteId="deletePositionId"
+      @apply-delete="deleteRecord(deletePositionId)"
       @update:deleteDialog="deleteDialog = $event"
       @delete="refreshPositions"
     />
@@ -39,13 +40,22 @@
     />
 
   </v-container>
+
+  <div class="pageContent">
+    <v-pagination 
+    v-model="pagination.page"
+    :length="pagination.pages"
+    :total-visible="5"
+    :page="pagination.page"
+    @input="nextPage"></v-pagination>
+    </div>
 </template>
 
 <script>
   import PositionsApi from "@/modules/positions/positionsApi";
   import positions_table from "@/modules/positions/positionsTable.vue";
   import PositionForm from "@/modules/positions/positionsForm.vue";
-  import PositionDeleteDialog from "@/modules/positions/positionsDelete.vue";
+  import PositionDeleteDialog from "@/components/deleteDialog.vue";
   import changelogDialog from "@/components/changelogDialog.vue";
 
   export default {
@@ -68,11 +78,43 @@
         dep_id: null,
       },
       posChangelog: [],
+      pagination: {
+        page: 1,
+        pages: 0,
+        itemsPerPage: 10,
+      },
     };
   },
+  created() {
+    this.getPosPages();
+  },
+  mounted() {
+      this.$refs.positions_table.fetchPositionsPage(this.$route.query.page);
+      this.pagination.page = !parseInt(this.$route.query.page) ? this.pagination.page : parseInt(this.$route.query.page)
+  },
+  watch: {
+    "pagination.page": function(value) {
+      this.$router.push({path: this.$route.fullPath, query: {page: value} })
+      this.$refs.positions_table.fetchPositionsPage(value);
+      this.page = value;
+    }
+  }, 
   methods: {
+    getPosPages() {
+      PositionsApi.getPosPages().then((data) => {
+          this.pagination.pages = Math.ceil(parseInt(data[0]['count']) / this.pagination.itemsPerPage);
+          }).catch((err) => {
+            console.log(err)
+      });
+    },
+    nextPage(value){
+      this.$router.push({path: this.$route.fullPath, query: {page: value} })
+      this.$refs.positions_table.fetchPositionsPage(value);
+      this.page = value;
+    },
     refreshPositions() {
-      this.$refs.positions_table.fetchPositions();
+      // this.$refs.positions_table.fetchPositions();
+      this.$refs.positions_table.fetchPositionsPage(this.$route.query.page);
     },
     openAddDialog() {
       this.TablePosition = [];
@@ -98,6 +140,11 @@
           console.log(err);
           this.posChangelog = [];
         });
+    },
+    deleteRecord(item_id) {
+        PositionsApi.deletePosition(item_id).then(
+          () => this.$refs.positions_table.fetchPositionsPage(this.$route.query.page)
+        )
     },
   },
   };

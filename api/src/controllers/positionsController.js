@@ -2,17 +2,39 @@ const pool = require('../services/db')
 const { addChangelog, compileChangelog } = require('./changelogController')
 const objectID = 3 //id positions = 3
 
-async function getPositions() {
-    const connection = await pool.connect()
+async function getPositions(page = 1) {
+  const connection = await pool.connect()
+  try {
+    if (!parseInt(page)) {
+      page = 1
+    }
+    await connection.query('BEGIN')
+    const result = await connection.query(
+      "SELECT positions.id, \
+      positions.name AS position_name, \
+      departments.name AS department_name, \
+      dep_id \
+      FROM positions \
+      JOIN departments ON positions.dep_id = departments.id \
+      WHERE positions.deleted_at IS NULL\
+      ORDER BY positions.id \
+      LIMIT 10 OFFSET ($1-1)*10;",
+      [page]
+    )
+    return result.rows
+  } catch (err) {
+    console.log(err)
+  } finally {
+    connection.release()
+  }
+}
+
+async function countPosRecords() {
+  const connection = await pool.connect()
     try {
+      await connection.query('BEGIN')
       const result = await connection.query(
-        "SELECT positions.id, \
-        positions.name AS position_name, \
-        departments.name AS department_name, \
-        dep_id \
-        FROM positions \
-        JOIN departments ON positions.dep_id = departments.id \
-        WHERE positions.deleted_at IS NULL",
+        "SELECT COUNT(id) FROM positions WHERE deleted_at IS NULL",
       )
       return result.rows
     } catch (err) {
@@ -20,7 +42,7 @@ async function getPositions() {
     } finally {
       connection.release()
     }
-  }
+}
 
 async function addPosition(req, name, dep_id) {
   const connection = await pool.connect()
@@ -144,4 +166,5 @@ module.exports = {
   addPosition,
   updatePosition,
   deletePosition,
+  countPosRecords,
 }

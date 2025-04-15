@@ -23,3 +23,7 @@
   };
 </script>
 
+<style lang="scss">
+@use './styles/style.scss';
+</style>
+

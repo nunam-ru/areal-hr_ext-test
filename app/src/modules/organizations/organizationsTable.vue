@@ -56,28 +56,16 @@
             console.log(err)
           });
       },
+      fetchOrganizationsPage(page) {
+        OrganizationsApi.getOrganizations(page).then((data) => {
+            this.organizations = data;
+          }).catch((err) => {
+            console.log(err)
+          });
+      },
       openChangelogDialog(item) {
       this.$emit("changelog", item);
     },
     },
   };
   </script>
-
-  <style scoped>
-  td, th {
-    max-width: 150px;
-    font-size: 1em;
-  }
-
-  th {
-    background-color: rgb(238, 238, 238);
-  }
-
-  .action_buttons {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 4px;
-    padding: 10% 0;
-  }
-  </style>
-  

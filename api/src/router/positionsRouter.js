@@ -10,6 +10,7 @@ const {
   addPosition,
   updatePosition,
   deletePosition,
+  countPosRecords,
 } = require('../controllers/positionsController')
 
 const { getChangelog, } = require('../controllers/changelogController')
@@ -19,8 +20,19 @@ const positionSchema = require('../controllers/val/positionsVal')
 
 router.get('/positions', async (req, res) => {
   try {
-    const positions = await getPositions()
+    const { page = 1 } = req.query;
+    const positions = await getPositions(page)
     return res.json(positions)
+  } catch (err) {
+    console.error('Error positions:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
+router.get('/positions/pages', async (req, res) => {
+  try {
+    const pages = await countPosRecords()
+    return res.json(pages)
   } catch (err) {
     console.error('Error positions:', err);
     res.status(500).json({ error: 'Internal server error' });

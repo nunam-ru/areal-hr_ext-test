@@ -83,6 +83,13 @@
             console.log(err)
           });
       },
+      fetchEmployeesPage(page) {
+        EmployeesApi.getEmployees(page).then((data) => {
+            this.employees = data;
+          }).catch((err) => {
+            console.log(err)
+          });
+      },
       openEditDialog(item) {
         this.$emit("edit", item);
       },
@@ -101,31 +108,4 @@
     },
   };
   </script>
-
-  <style scoped>
-  td, th {
-    max-width: 200px;
-    font-size: 1em;
-  }
-
-  th {
-    background-color: rgb(238, 238, 238);
-  }
-
-  .fired_str {
-    color: red;
-    font-weight: bold;
-  }
-
-  .action_buttons {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
-  padding: 10% 0;
-  }
-
-  :deep(.v-btn__content) {
-    font-size: .6em;
-  }
-  </style>
   

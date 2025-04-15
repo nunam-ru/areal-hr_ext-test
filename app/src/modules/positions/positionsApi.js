@@ -1,9 +1,20 @@
 import api from "@/shared/api/axios";
 
 export default {
-  getPositions() {
+  getPosPages() {
     return api
-      .get("/positions")
+      .get("/positions/pages")
+      .then((response) => response.data)
+      .catch((err) => {
+        if (err.response && err.response.status === 401) {
+          window.location.reload();
+        }
+        throw err;
+      });
+  },
+  getPositions(pageID) {
+    return api
+      .get("/positions", {params: {page: pageID}})
       .then((response) => response.data)
       .catch((err) => {
         if (err.response && err.response.status === 401) {

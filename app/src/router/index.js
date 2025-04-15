@@ -8,7 +8,9 @@ import Users from "../pages/usersPage.vue";
 const routes = [
   { path: "/employees", component: Employees },
   { path: "/departments", component: Departments },
-  { path: "/organizations", component: Organizations },
+  { path: "/organizations", component: Organizations,
+    props: route => ({ page: route.query.page })
+  },
   { path: "/positions", component: Positions },
   { path: "/users", component: Users },
 ];

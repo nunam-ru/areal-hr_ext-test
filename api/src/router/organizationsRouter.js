@@ -10,6 +10,7 @@ const {
   addOrganization,
   updateOrganization,
   deleteOrganization,
+  countOrgRecords,
 } = require('../controllers/organizationsController')
 
 const { getChangelog, } = require('../controllers/changelogController')
@@ -18,8 +19,19 @@ const organizationSchema = require('../controllers/val/organizationsVal')
 
 router.get('/organizations', async (req, res) => {
   try {
-    const organizations = await getOrganizations()
+    const { page = 1 } = req.query;
+    const organizations = await getOrganizations(page)
     return res.json(organizations)
+  } catch (err) {
+    console.error('Error organizations:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
+router.get('/organizations/pages', async (req, res) => {
+  try {
+    const pages = await countOrgRecords()
+    return res.json(pages)
   } catch (err) {
     console.error('Error organizations:', err);
     res.status(500).json({ error: 'Internal server error' });

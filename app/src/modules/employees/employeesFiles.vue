@@ -123,7 +123,6 @@
         EmployeesApi.downloadFile(file.file_id)
           .then((response) => {
             const blob = new Blob([response.data]);
-            console.log(response);
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.href = url;

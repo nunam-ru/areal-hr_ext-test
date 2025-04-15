@@ -2,22 +2,45 @@ const pool = require('../services/db')
 const { addChangelog, compileChangelog } = require('./changelogController')
 const objectID = 2 //id departments = 2
 
-async function getDepartments() {
-    const connection = await pool.connect()
+async function getDepartments(page = 1) {
+  const connection = await pool.connect()
+  try {
+    if (!parseInt(page)) {
+      page = 1
+    }
+    await connection.query('BEGIN')
+    const result = await connection.query(
+      "SELECT d.id AS department_id, \
+      d.name AS department_name, \
+      pd.name AS parent_name, \
+      pd.id as parent_id, \
+      d.comment AS department_comment, \
+      o.name AS organization_name, \
+      o.id as org_id \
+      FROM departments AS d \
+      LEFT JOIN departments AS pd \
+      ON d.parent_id = pd.id \
+      LEFT JOIN organizations AS o ON d.org_id = o.id \
+      WHERE d.deleted_at IS NULL\
+      ORDER BY d.id \
+      LIMIT 10 OFFSET ($1-1)*10;",
+      [page]
+    )
+    return result.rows
+  } catch (err) {
+    console.log(err)
+  } finally {
+    connection.release()
+  }
+}
+
+async function countDepRecords() {
+  const connection = await pool.connect()
     try {
+      await connection.query('BEGIN')
       const result = await connection.query(
-        "SELECT d.id AS department_id, \
-        d.name AS department_name, \
-        pd.name AS parent_name, \
-        pd.id as parent_id, \
-        d.comment AS department_comment, \
-        o.name AS organization_name, \
-        o.id as org_id \
-        FROM departments AS d \
-        LEFT JOIN departments AS pd \
-        ON d.parent_id = pd.id \
-        LEFT JOIN organizations AS o ON d.org_id = o.id \
-        WHERE d.deleted_at IS NULL;",
+        "SELECT COUNT(id) FROM departments \
+        WHERE deleted_at IS NULL",
       )
       return result.rows
     } catch (err) {
@@ -25,7 +48,7 @@ async function getDepartments() {
     } finally {
       connection.release()
     }
-  }
+}
 
 async function addDepartment(req, name, comment, parent_id, org_id) {
   const connection = await pool.connect()
@@ -207,4 +230,5 @@ module.exports = {
   addDepartment,
   updateDepartment,
   deleteDepartment,
+  countDepRecords,
 }

@@ -55,6 +55,14 @@
             console.log(err)
           });
       },
+      fetchDepartmentsPage(page) {
+        DepartmentsApi.getDepartments(page).then((data) => {
+            this.departments = data;
+            this.$emit("updateDepartments", this.departments);
+          }).catch((err) => {
+            console.log(err)
+          });
+      },
       openEditDialog(item) {
       this.$emit("edit", item);
       },
@@ -67,22 +75,3 @@
     },
   };
   </script>
-
-  <style scoped>
-  td, th {
-    max-width: 150px;
-    font-size: 1em;
-  }
-
-  th {
-    background-color: rgb(238, 238, 238);
-  }
-
-  .action_buttons {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 4px;
-    padding: 10% 0;
-  }
-  </style>
-  

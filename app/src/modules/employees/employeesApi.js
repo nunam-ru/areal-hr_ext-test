@@ -1,9 +1,20 @@
 import api from "@/shared/api/axios";
 
 export default {
-  getEmployees() {
+  getEmpPages() {
     return api
-      .get("/employees")
+      .get("/employees/pages")
+      .then((response) => response.data)
+      .catch((err) => {
+        if (err.response && err.response.status === 401) {
+          window.location.reload();
+        }
+        throw err;
+      });
+  },
+  getEmployees(pageID) {
+    return api
+      .get("/employees", {params: {page: pageID}})
       .then((response) => response.data)
       .catch((err) => {
         if (err.response && err.response.status === 401) {
@@ -18,33 +29,15 @@ export default {
       formData.append(`files`, file);
     });
 
-    if (employee.last_name) 
-      formData.append("last_name", employee.last_name);
-    if (employee.first_name) 
-      formData.append("first_name", employee.first_name);
-    if (employee.third_name)
-      formData.append("third_name", employee.third_name);
-    if (employee.birth_date)
-      formData.append("birth_date", employee.birth_date);
-    if (employee.passport_series)
-      formData.append("passport_series", employee.passport_series);
-    if (employee.passport_number)
-      formData.append("passport_number", employee.passport_number);
-    if (employee.passport_code)
-      formData.append("passport_code", employee.passport_code);
-    if (employee.passport_by)
-      formData.append("passport_by", employee.passport_by);
-    if (employee.passport_date)
-      formData.append("passport_date", employee.passport_date);
-    if (employee.address) 
-      formData.append("address", employee.address);
-    if (employee.dep_id)
-      formData.append("dep_id", employee.dep_id);
-    if (employee.pos_id)
-      formData.append("pos_id", employee.pos_id);
-    if (employee.salary) 
-      formData.append("salary", employee.salary);
-
+    for (let el in employee) {
+      if (['department_name', 'position_name', 'id'].includes(el)) {
+        continue
+      }
+      if (el != null || ''){
+        formData.append(el, employee[el]);
+      }
+    }
+    
     return api
       .post("/employees", formData, {
         headers: {
@@ -122,7 +115,6 @@ export default {
     formData.append("last_name", Employee.last_name);
     formData.append("first_name", Employee.first_name);
     formData.append("third_name", Employee.third_name);
-    console.log(formData);
 
     return api
       .post(`/files/${Employee.id}`, formData, {

@@ -2,11 +2,19 @@ const pool = require('../services/db')
 const { addChangelog, compileChangelog } = require('./changelogController')
 const objectID = 1 //id organizations = 1
 
-async function getOrganizations() {
+async function getOrganizations(page = 1) {
     const connection = await pool.connect()
     try {
+      if (!parseInt(page)) {
+        page = 1
+      }
+      await connection.query('BEGIN')
       const result = await connection.query(
-        "SELECT * FROM organizations WHERE deleted_at IS NULL;",
+        "SELECT * FROM organizations \
+        WHERE deleted_at IS NULL \
+        ORDER BY id \
+        LIMIT 10 OFFSET ($1-1)*10;",
+        [page]
       )
       return result.rows
     } catch (err) {
@@ -15,6 +23,21 @@ async function getOrganizations() {
       connection.release()
     }
   }
+
+async function countOrgRecords() {
+  const connection = await pool.connect()
+    try {
+      await connection.query('BEGIN')
+      const result = await connection.query(
+        "SELECT COUNT(id) FROM organizations WHERE deleted_at IS NULL",
+      )
+      return result.rows
+    } catch (err) {
+      console.log(err)
+    } finally {
+      connection.release()
+    }
+}
 
 async function addOrganization(req, name, comment) {
   const connection = await pool.connect()
@@ -133,5 +156,6 @@ module.exports = {
   addOrganization,
   updateOrganization,
   deleteOrganization,
+  countOrgRecords,
 }
   
