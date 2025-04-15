@@ -2,7 +2,7 @@
 
 #### Windows 10 + VSCode + PostgreSQL 17 Docker
 
-![diagram image](https://github.com/nunam-ru/areal-hr_ext-test/blob/main/diagram.png)
+![diagram image](https://github.com/nunam-ru/areal-hr_ext-test/blob/main/docs/diagram.png)
 
 ## Структура проекта
 
