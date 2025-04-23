@@ -1,54 +1,52 @@
 <template>
   <!-- <HelloWorld /> -->
-  <v-container fluid class="d-flex flex-column" style="padding: 0">
-    <v-toolbar flat>
-      <v-toolbar-title>Отделы</v-toolbar-title>
-      <v-btn
-        @click="openAddDialog(false)"
-        variant="outlined"
-        class="action_button white--text"
-      >
-        новый отдел
-      </v-btn>
-      <v-btn
-        @click="openAddDialog(true)"
-        variant="outlined"
-        class="action_button white--text"
-      >
-        новый подотдел
-      </v-btn>
-    </v-toolbar>
-    <DepartmentForm
-      :dialog="dialog"
-      :isAddMode="isAddMode"
-      :is-sub-department-mode="isSubDepartmentMode"
-      :departments="departments"
-      :TableDepartment="TableDepartment"
-      @update:dialog="dialog = $event"
-      @save="refreshDepartments"
-    />
+  <v-toolbar flat>
+    <v-toolbar-title>Отделы</v-toolbar-title>
+    <v-btn
+      @click="openAddDialog(false)"
+      variant="outlined"
+      class="action_button white--text"
+    >
+      новый отдел
+    </v-btn>
+    <v-btn
+      @click="openAddDialog(true)"
+      variant="outlined"
+      class="action_button white--text"
+    >
+      новый подотдел
+    </v-btn>
+  </v-toolbar>
+  <DepartmentForm
+    :dialog="dialog"
+    :isAddMode="isAddMode"
+    :is-sub-department-mode="isSubDepartmentMode"
+    :departments="departments"
+    :TableDepartment="TableDepartment"
+    @update:dialog="dialog = $event"
+    @save="refreshDepartments"
+  />
 
-    <DepartmentDeleteDialog
-      :deleteDialog="deleteDialog"
-      :deleteId="deleteDepartmentId"
-      @apply-delete="deleteRecord(deleteDepartmentId)"
-      @update:deleteDialog="deleteDialog = $event"
-      @delete="refreshDepartments"
-    />
+  <DepartmentDeleteDialog
+    :deleteDialog="deleteDialog"
+    :deleteId="deleteDepartmentId"
+    @apply-delete="deleteRecord(deleteDepartmentId)"
+    @update:deleteDialog="deleteDialog = $event"
+    @delete="refreshDepartments"
+  />
 
-    <changelogDialog
-      :changelogDialog="changelogDialog"
-      :changelog="depChangelog"
-      @update:changelogDialog="changelogDialog = $event"
-    />
+  <changelogDialog
+    :changelogDialog="changelogDialog"
+    :changelog="depChangelog"
+    @update:changelogDialog="changelogDialog = $event"
+  />
 
-    <departmentsTable ref="departmentsTable"
-      @edit="openEditDialog"
-      @delete="openDeleteDialog"
-      @updateDepartments="handleUpdateDepartments"
-      @changelog="fetchDepChangelog"
-    />
-  </v-container>
+  <departmentsTable ref="departmentsTable"
+    @edit="openEditDialog"
+    @delete="openDeleteDialog"
+    @updateDepartments="handleUpdateDepartments"
+    @changelog="fetchDepChangelog"
+  />
   <div class="pageContent">
     <v-pagination 
     v-model="pagination.page"
@@ -101,13 +99,25 @@
     this.getDepPages();
   },
   mounted() {
-      this.$refs.departmentsTable.fetchDepartmentsPage(this.$route.query.page);
+      this.$refs.departmentsTable.fetchDepartmentsPage(
+        this.$route.query.page, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
       this.pagination.page = !parseInt(this.$route.query.page) ? this.pagination.page : parseInt(this.$route.query.page)
   },
   watch: {
     "pagination.page": function(value) {
-      this.$router.push({path: this.$route.fullPath, query: {page: value} })
-      this.$refs.departmentsTable.fetchDepartmentsPage(value);
+      this.$router.push({path: this.$route.fullPath, query: {
+        page: value,
+        sort_type: this.$route.query.sort_type,
+        order_by: this.$route.query.order_by,
+      } })
+      this.$refs.departmentsTable.fetchDepartmentsPage(
+        value, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
       this.page = value;
     }
   }, 
@@ -120,8 +130,16 @@
       });
     },
     nextPage(value){
-      this.$router.push({path: this.$route.fullPath, query: {page: value} })
-      this.$refs.departmentsTable.fetchDepartmentsPage(value);
+      this.$router.push({path: this.$route.fullPath, query: {
+        page: value,
+        sort_type: this.$route.query.sort_type,
+        order_by: this.$route.query.order_by,
+      } })
+      this.$refs.departmentsTable.fetchDepartmentsPage(
+        value, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
       this.page = value;
     },
     handleUpdateDepartments(departments) {
@@ -129,7 +147,10 @@
     },
     refreshDepartments() {
       //this.$refs.departmentsTable.fetchDepartments();
-      this.$refs.departmentsTable.fetchDepartmentsPage(this.$route.query.page);
+      this.$refs.departmentsTable.fetchDepartmentsPage(
+        this.$route.query.page, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by);
     },
     openAddDialog(isSubDepartmentMode) {
       this.isAddMode = true;
@@ -165,7 +186,11 @@
     },
     deleteRecord(item_id) {
       DepartmentsApi.deleteDepartment(item_id).then(
-        () => this.$refs.departmentsTable.fetchDepartmentsPage(this.$route.query.page)
+        () => this.$refs.departmentsTable.fetchDepartmentsPage(
+          this.$route.query.page, 
+          this.$route.query.sort_type, 
+          this.$route.query.order_by
+      )
       )
     },
   },

@@ -20,8 +20,11 @@ const positionSchema = require('../controllers/val/positionsVal')
 
 router.get('/positions', async (req, res) => {
   try {
-    const { page = 1 } = req.query;
-    const positions = await getPositions(page)
+    const { 
+      page = 1, 
+      sort_type = 'id',
+      order_by = 'asc' } = req.query;
+    const positions = await getPositions(page, sort_type, order_by)
     return res.json(positions)
   } catch (err) {
     console.error('Error positions:', err);

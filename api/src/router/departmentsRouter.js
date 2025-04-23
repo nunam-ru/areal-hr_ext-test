@@ -19,8 +19,10 @@ const departmentSchema = require('../controllers/val/departmentsVal')
 
 router.get('/departments', async (req, res) => {
   try {
-    const { page = 1 } = req.query;
-    const departments = await getDepartments(page)
+    const { page = 1, 
+      sort_type = 'department_id',
+      order_by = 'asc' } = req.query;
+    const departments = await getDepartments(page, sort_type, order_by)
     return res.json(departments)
   } catch (err) {
     console.error('Error departments:', err);

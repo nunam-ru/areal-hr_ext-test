@@ -1,60 +1,58 @@
 <template>
   <!-- <HelloWorld /> -->
-  <v-container fluid class="d-flex flex-column" style="padding: 0">
-    <v-toolbar flat>
-      <v-toolbar-title>Сотрудники</v-toolbar-title>
-      <v-btn
-        @click="openAddDialog()"
-        variant="outlined"
-        class="white--text"
-      >
-        Добавить
-      </v-btn>
-    </v-toolbar>
+  <v-toolbar flat>
+    <v-toolbar-title>Сотрудники</v-toolbar-title>
+    <v-btn
+      @click="openAddDialog()"
+      variant="outlined"
+      class="white--text"
+    >
+      Добавить
+    </v-btn>
+  </v-toolbar>
 
-    <EmployeesDetailsDialog
-      :detailsDialog="detailsDialog"
-      :TableEmployees="TableEmployees"
-      @update:detailsDialog="detailsDialog = $event"
-    />
+  <EmployeesDetailsDialog
+    :detailsDialog="detailsDialog"
+    :TableEmployees="TableEmployees"
+    @update:detailsDialog="detailsDialog = $event"
+  />
 
-    <EmployeesDeleteDialog
-      :deleteDialog="deleteDialog"
-      :deleteId="deleteEmployeeId"
-      @apply-delete="deleteRecord(deleteEmployeeId)"
-      @update:deleteDialog="deleteDialog = $event"
-      @delete="refreshEmployees"
-    />
+  <EmployeesDeleteDialog
+    :deleteDialog="deleteDialog"
+    :deleteId="deleteEmployeeId"
+    @apply-delete="deleteRecord(deleteEmployeeId)"
+    @update:deleteDialog="deleteDialog = $event"
+    @delete="refreshEmployees"
+  />
 
-    <changelogDialog
-      :changelogDialog="changelogDialog"
-      :changelog="empChangelog"
-      @update:changelogDialog="changelogDialog = $event"
-    />
+  <changelogDialog
+    :changelogDialog="changelogDialog"
+    :changelog="empChangelog"
+    @update:changelogDialog="changelogDialog = $event"
+  />
 
-    <EmployeesFilesDialog
-      :filesDialog="filesDialog"
-      :TableEmployees="TableEmployees"
-      @update:filesDialog="filesDialog = $event"
-    />
+  <EmployeesFilesDialog
+    :filesDialog="filesDialog"
+    :TableEmployees="TableEmployees"
+    @update:filesDialog="filesDialog = $event"
+  />
 
-    <EmployeesForm
-      :dialog="dialog"
-      :isEditMode="isEditMode"
-      :TableEmployees="TableEmployees"
-      @save="refreshEmployees"
-      @update:dialog="dialog = $event"
-    />
+  <EmployeesForm
+    :dialog="dialog"
+    :isEditMode="isEditMode"
+    :TableEmployees="TableEmployees"
+    @save="refreshEmployees"
+    @update:dialog="dialog = $event"
+  />
 
-    <employees_table ref="employees_table" 
-      @edit="openEditDialog"
-      @delete="openDeleteDialog"
-      @DetailsDialog="openDetailsDialog"
-      @FilesDialog="openFilesDialog"
-      @changelog="fetchEmpChangelog"/>
+  <employees_table ref="employees_table" 
+    @edit="openEditDialog"
+    @delete="openDeleteDialog"
+    @DetailsDialog="openDetailsDialog"
+    @FilesDialog="openFilesDialog"
+    @changelog="fetchEmpChangelog"/>
 
 
-  </v-container>
   <div class="pageContent">
     <v-pagination 
     v-model="pagination.page"
@@ -122,13 +120,25 @@
     this.getEmpPages();
   },
   mounted() {
-      this.$refs.employees_table.fetchEmployeesPage(this.$route.query.page);
+      this.$refs.employees_table.fetchEmployeesPage(
+        this.$route.query.page, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
       this.pagination.page = !parseInt(this.$route.query.page) ? this.pagination.page : parseInt(this.$route.query.page)
   },
   watch: {
     "pagination.page": function(value) {
-      this.$router.push({path: this.$route.fullPath, query: {page: value} })
-      this.$refs.employees_table.fetchEmployeesPage(value);
+      this.$router.push({path: this.$route.fullPath, query: {
+        page: value,
+        sort_type: this.$route.query.sort_type,
+        order_by: this.$route.query.order_by,
+      } })
+      this.$refs.employees_table.fetchEmployeesPage(
+        value, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
       this.page = value;
     }
   }, 
@@ -141,13 +151,25 @@
       });
     },
     nextPage(value){
-      this.$router.push({path: this.$route.fullPath, query: {page: value} })
-      this.$refs.employees_table.fetchEmployeesPage(value);
+      this.$router.push({path: this.$route.fullPath, query: {
+        page: value,
+        sort_type: this.$route.query.sort_type,
+        order_by: this.$route.query.order_by,
+      } })
+      this.$refs.employees_table.fetchEmployeesPage(
+        value, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
       this.page = value;
     },
     refreshEmployees() {
       //this.$refs.employees_table.fetchEmployees();
-      this.$refs.employees_table.fetchEmployeesPage(this.$route.query.page);
+      this.$refs.employees_table.fetchEmployeesPage(
+        this.$route.query.page, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
     },
     openAddDialog() {
       this.isEditMode = false;
@@ -224,7 +246,11 @@
     },
     deleteRecord(item_id) {
       employeesApi.deleteEmployee(item_id).then(
-        () => this.$refs.employees_table.fetchEmployeesPage(this.$route.query.page)
+        () => this.$refs.employees_table.fetchEmployeesPage(
+          this.$route.query.page, 
+          this.$route.query.sort_type, 
+          this.$route.query.order_by
+      )
       )
     },
   },

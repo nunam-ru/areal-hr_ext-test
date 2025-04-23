@@ -2,7 +2,10 @@ const pool = require('../services/db')
 const { addChangelog, compileChangelog } = require('./changelogController')
 const objectID = 2 //id departments = 2
 
-async function getDepartments(page = 1) {
+async function getDepartments(
+  page = 1,
+  sort_type = 'department_id',
+  order_by = 'asc') {
   const connection = await pool.connect()
   try {
     if (!parseInt(page)) {
@@ -10,7 +13,7 @@ async function getDepartments(page = 1) {
     }
     await connection.query('BEGIN')
     const result = await connection.query(
-      "SELECT d.id AS department_id, \
+      `SELECT d.id AS department_id, \
       d.name AS department_name, \
       pd.name AS parent_name, \
       pd.id as parent_id, \
@@ -22,8 +25,8 @@ async function getDepartments(page = 1) {
       ON d.parent_id = pd.id \
       LEFT JOIN organizations AS o ON d.org_id = o.id \
       WHERE d.deleted_at IS NULL\
-      ORDER BY d.id \
-      LIMIT 10 OFFSET ($1-1)*10;",
+      ORDER BY ${sort_type} ${order_by} \
+      LIMIT 10 OFFSET ($1-1)*10;`,
       [page]
     )
     return result.rows

@@ -33,3 +33,27 @@ th {
   font-size: .7em;
 }
 
+.table_col:hover{
+  background-color: rgb(212, 212, 212);
+}
+
+.sorted_asc {
+  background-color: rgb(210, 255, 240);
+  &:after {
+    content: " ↑";
+  }
+  &:hover {
+    background-color: rgb(133, 255, 214);
+  }
+}
+
+.sorted_desc {
+  background-color: rgb(255, 210, 210);
+  &:after {
+    content: " ↓";
+  }
+  &:hover {
+    background-color: rgb(255, 152, 152);
+  }
+}
+

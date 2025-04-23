@@ -3,14 +3,17 @@ const argon2 = require('argon2')
 const { addChangelog, compileChangelog } = require('./changelogController')
 const objectID = 5 //id users = 5
 
-async function getUsers(page = 1) {
+async function getUsers(
+  page = 1, 
+  sort_type = 'id',
+  order_by = 'asc') {
   const connection = await pool.connect()
   try {
     if (!parseInt(page)) {
       page = 1
     }
     const result = await connection.query(
-      "SELECT users.id, \
+      `SELECT users.id, \
       last_name, \
       first_name, \
       third_name, \
@@ -20,8 +23,8 @@ async function getUsers(page = 1) {
       FROM users \
       JOIN roles ON users.role_id = roles.id \
       WHERE deleted_at IS NULL \
-      ORDER BY users.id \
-      LIMIT 10 OFFSET ($1-1)*10;",
+      ORDER BY ${sort_type} ${order_by} \
+      LIMIT 10 OFFSET ($1-1)*10;`,
       [page]
     )
     return result.rows

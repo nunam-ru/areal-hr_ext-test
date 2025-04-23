@@ -12,9 +12,15 @@ export default {
         throw err;
       });
   },
-  getEmployees(pageID) {
+  getEmployees(pageID, sortCol, orderBy) {
     return api
-      .get("/employees", {params: {page: pageID}})
+      .get("/employees", {
+        params: {
+          page: pageID,
+          sort_type: sortCol,
+          order_by: orderBy,
+        }
+      })
       .then((response) => response.data)
       .catch((err) => {
         if (err.response && err.response.status === 401) {

@@ -24,8 +24,11 @@ const upload = multer({ storage: storage })
 
 router.get('/employees', async (req, res) => {
   try {
-    const { page = 1 } = req.query;
-    const employees = await getEmployees(page)
+    const { 
+      page = 1, 
+      sort_type = 'id',
+      order_by = 'asc'  } = req.query;
+    const employees = await getEmployees(page, sort_type, order_by)
     return res.json(employees)
   } catch (err) {
     console.error('Error employees:', err);

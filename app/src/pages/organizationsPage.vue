@@ -1,46 +1,44 @@
 <template>
   <!-- <HelloWorld /> -->
-  <v-container fluid class="d-flex flex-column" style="padding: 0">
-    <v-toolbar flat>
-      <v-toolbar-title>Организации</v-toolbar-title>
-      <v-btn
-        @click="openAddDialog"
-        variant="outlined"
-        class="action_button white--text"
-      >
-        Добавить
-      </v-btn>
-    </v-toolbar>
+  <v-toolbar flat>
+    <v-toolbar-title>Организации</v-toolbar-title>
+    <v-btn
+      @click="openAddDialog"
+      variant="outlined"
+      class="action_button white--text"
+    >
+      Добавить
+    </v-btn>
+  </v-toolbar>
 
-    <OrganizationForm
-      :dialog="dialog"
-      :isEditMode="isEditMode"
-      :organization="TableOrganization"
-      @update:dialog="dialog = $event"
-      @save="refreshOrganizations"
-    />
+  <OrganizationForm
+    :dialog="dialog"
+    :isEditMode="isEditMode"
+    :organization="TableOrganization"
+    @update:dialog="dialog = $event"
+    @save="refreshOrganizations"
+  />
 
-    <OrganizationDeleteDialog
-      :deleteDialog="deleteDialog"
-      :deleteId="deleteOrganizationId"
-      @apply-delete="deleteRecord(deleteOrganizationId)"
-      @update:deleteDialog="deleteDialog = $event"
-      @delete="refreshOrganizations"
-    />
+  <OrganizationDeleteDialog
+    :deleteDialog="deleteDialog"
+    :deleteId="deleteOrganizationId"
+    @apply-delete="deleteRecord(deleteOrganizationId)"
+    @update:deleteDialog="deleteDialog = $event"
+    @delete="refreshOrganizations"
+  />
 
-    <changelogDialog
-      :changelogDialog="changelogDialog"
-      :changelog="orgChangelog"
-      @update:changelogDialog="changelogDialog = $event"
-    />
-    
-    <organizations_table 
-      ref="organizations_table"
-      @edit="openEditDialog"
-      @delete="openDeleteDialog" 
-      @changelog="fetchOrgChangelog"
-    />
-  </v-container>
+  <changelogDialog
+    :changelogDialog="changelogDialog"
+    :changelog="orgChangelog"
+    @update:changelogDialog="changelogDialog = $event"
+  />
+  
+  <organizations_table 
+    ref="organizations_table"
+    @edit="openEditDialog"
+    @delete="openDeleteDialog" 
+    @changelog="fetchOrgChangelog"
+  />
   <div class="pageContent">
     <v-pagination 
     v-model="pagination.page"
@@ -92,13 +90,25 @@
     this.getOrgPages();
   },
   mounted() {
-      this.$refs.organizations_table.fetchOrganizationsPage(this.$route.query.page);
+      this.$refs.organizations_table.fetchOrganizationsPage(
+        this.$route.query.page, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
       this.pagination.page = !parseInt(this.$route.query.page) ? this.pagination.page : parseInt(this.$route.query.page)
   },
   watch: {
     "pagination.page": function(value) {
-      this.$router.push({path: this.$route.fullPath, query: {page: value} })
-      this.$refs.organizations_table.fetchOrganizationsPage(value);
+      this.$router.push({path: this.$route.fullPath, query: {
+        page: value,
+        sort_type: this.$route.query.sort_type,
+        order_by: this.$route.query.order_by,
+      } })
+      this.$refs.organizations_table.fetchOrganizationsPage(
+        value, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
       this.page = value;
     }
   }, 
@@ -111,12 +121,24 @@
       });
     },
     nextPage(value){
-      this.$router.push({path: this.$route.fullPath, query: {page: value} })
-      this.$refs.organizations_table.fetchOrganizationsPage(value);
+      this.$router.push({path: this.$route.fullPath, query: {
+        page: value,
+        sort_type: this.$route.query.sort_type,
+        order_by: this.$route.query.order_by,
+      } })
+      this.$refs.organizations_table.fetchOrganizationsPage(
+        value, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
       this.page = value;
     },
     refreshOrganizations() {
-      this.$refs.organizations_table.fetchOrganizationsPage(this.$route.query.page);
+      this.$refs.organizations_table.fetchOrganizationsPage(
+        this.$route.query.page, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
     },
     openAddDialog() {
       this.isEditMode = false;
@@ -145,7 +167,11 @@
     },
     deleteRecord(item_id) {
         OrganizationsApi.deleteOrganization(item_id).then(
-          () => this.$refs.organizations_table.fetchOrganizationsPage(this.$route.query.page)
+          () => this.$refs.organizations_table.fetchOrganizationsPage(
+            this.$route.query.page, 
+            this.$route.query.sort_type, 
+            this.$route.query.order_by
+          )
         )
     },
     

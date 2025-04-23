@@ -12,9 +12,15 @@ export default {
         throw err;
       });
   },
-  getUsers(pageID) {
+  getUsers(pageID, sortCol, orderBy) {
     return api
-      .get("/users", {params: {page: pageID}})
+      .get("/users", {
+        params: {
+          page: pageID,
+          sort_type: sortCol,
+          order_by: orderBy,
+        }
+      })
       .then((response) => response.data)
       .catch((err) => {
         if (err.response && err.response.status === 401) {
@@ -41,7 +47,6 @@ export default {
       });
   },
   addUser(user) {
-    console.log(user);
 
     return api
       .post("/users", user)

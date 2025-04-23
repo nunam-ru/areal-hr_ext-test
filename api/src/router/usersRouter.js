@@ -22,8 +22,11 @@ const {
 
 router.get('/users', async (req, res) => {
   try {
-    const { page = 1 } = req.query;
-    const users = await getUsers(page)
+    const { 
+      page = 1, 
+      sort_type = 'id',
+      order_by = 'asc'  } = req.query;
+    const users = await getUsers(page, sort_type, order_by)
     return res.json(users)
   } catch (err) {
     console.error('Error users:', err);

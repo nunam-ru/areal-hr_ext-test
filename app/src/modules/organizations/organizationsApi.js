@@ -12,9 +12,15 @@ export default {
         throw err;
       });
   },
-  getOrganizations(pageID) {
+  getOrganizations(pageID, sortCol, orderBy) {
     return api
-      .get("/organizations", {params: {page: pageID}})
+      .get("/organizations", {
+        params: {
+          page: pageID,
+          sort_type: sortCol,
+          order_by: orderBy,
+        }
+      })
       .then((response) => response.data)
       .catch((err) => {
         if (err.response && err.response.status === 401) {

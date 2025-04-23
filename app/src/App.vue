@@ -7,7 +7,9 @@
     </v-app-bar>
     <Sidebar/>
     <v-main app > <!--class="pa-4"-->
-      <router-view></router-view>
+      <v-container fluid class="d-flex flex-column" style="padding: 0">
+        <router-view></router-view>
+      </v-container>
     </v-main>
   </v-app>
 </template>

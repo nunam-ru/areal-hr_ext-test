@@ -5,7 +5,11 @@
       max-width="1000px"
     >
       <v-card>
-        <v-card-title class="headline">История записи</v-card-title>
+          <v-card-actions>
+            <v-card-title class="headline">История записи</v-card-title>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="closeDialog">Закрыть</v-btn>
+          </v-card-actions>
         <v-table>
           <thead>
             <tr>
@@ -26,10 +30,6 @@
             </tr>
           </tbody>
         </v-table>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="closeDialog">Закрыть</v-btn>
-        </v-card-actions>
       </v-card>
     </v-dialog>
   </template>

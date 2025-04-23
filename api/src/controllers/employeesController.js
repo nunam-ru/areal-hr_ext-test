@@ -9,7 +9,10 @@ function nullToEmpty(value) {
   return value
 }
 
-async function getEmployees(page = 1) {
+async function getEmployees(
+  page = 1, 
+  sort_type = 'id',
+  order_by = 'asc') {
   const connection = await pool.connect()
   try {
     if (!parseInt(page)) {
@@ -17,7 +20,7 @@ async function getEmployees(page = 1) {
     }
     await connection.query('BEGIN')
     const result = await connection.query(
-      "SELECT e.id, \
+      `SELECT e.id, \
         e.last_name, \
         e.first_name, \
         e.third_name, \
@@ -38,8 +41,8 @@ async function getEmployees(page = 1) {
         JOIN hr_operations hr on e.id = hr.emp_id \
         join departments d on hr.dep_id = d.id \
         join positions p on hr.pos_id = p.id \
-        ORDER BY e.id\
-        LIMIT 10 OFFSET ($1-1)*10;",
+        ORDER BY ${sort_type} ${order_by} \
+        LIMIT 10 OFFSET ($1-1)*10;`,
       [page]
     )
     return result.rows

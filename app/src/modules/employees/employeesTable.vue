@@ -2,13 +2,22 @@
     <v-table>
       <thead>
         <tr>
-          <th>Код</th>
-          <th>Фамилия</th>
-          <th>Имя</th>
-          <th>Отчество</th>
-          <th>Дата рождения</th>
-          <th>Адрес</th>
-          <th>Паспорт</th>
+          <th class="table_col" v-for="[key, value] of Object.entries({
+            'id': 'Код', 
+            'last_name': 'Фамилия', 
+            'first_name': 'Имя',
+            'third_name': 'Отчество',
+            'birth_date': 'Дата рождения',
+            'address': 'Адрес',
+            'passport_series': 'Паспорт',
+            })"
+            @click="sortHeader(key)"
+          :class="{
+              'sorted_asc': this.asc[key] === 1 || (this.$route.query.sort_type === key && this.$route.query.order_by === 'asc'),
+              'sorted_desc': this.asc[key] === 2 || (this.$route.query.sort_type === key && this.$route.query.order_by === 'desc'),
+              'not_sorted': this.asc[key] === 0
+            }">{{ value }}
+          </th>
           <th></th>
           <th></th>
         </tr>
@@ -70,12 +79,52 @@
     data() {
       return {
         employees: [],
+        asc: {
+          'id': 0, 
+          'last_name': 0, 
+          'first_name': 0,
+          'third_name': 0,
+          'birth_date': 0,
+          'address': 0,
+          'passport_series': 0,
+        },
       };
     },
     mounted() {
       this.fetchEmployees();
     },
     methods: {
+      sortHeader(field) {
+        for (let [key, value] of Object.entries(this.asc)) {
+          if (key != field) {
+            this.asc[key] = 0
+          }
+        }
+        if (this.asc[field] === 1) {
+          this.asc[field] = 2
+          this.$router.push({path: this.$route.fullPath, query: {
+            page: this.$route.query.page,
+            sort_type: field,
+            order_by: 'desc'
+          } })
+          this.fetchEmployeesPage(this.$route.query.page, field, 'desc');
+        }
+        else if (this.asc[field] === 2) {
+          this.asc[field] = 0
+          this.$router.push({path: this.$route.fullPath, query: {
+            page: this.$route.query.page,}})
+          this.fetchEmployeesPage(this.$route.query.page);
+        }
+        else if (this.asc[field] === 0) {
+          this.asc[field] = 1
+          this.$router.push({path: this.$route.fullPath, query: {
+            page: this.$route.query.page,
+            sort_type: field,
+            order_by: 'asc'
+          } })
+          this.fetchEmployeesPage(this.$route.query.page, field, 'asc');
+        }
+      },
       fetchEmployees() {
         EmployeesApi.getEmployees().then((data) => {
             this.employees = data;
@@ -83,8 +132,8 @@
             console.log(err)
           });
       },
-      fetchEmployeesPage(page) {
-        EmployeesApi.getEmployees(page).then((data) => {
+      fetchEmployeesPage(page, sort_type, order_by) {
+        EmployeesApi.getEmployees(page, sort_type, order_by).then((data) => {
             this.employees = data;
           }).catch((err) => {
             console.log(err)

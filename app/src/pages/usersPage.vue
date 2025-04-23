@@ -1,65 +1,62 @@
 <template>
   <!-- <HelloWorld /> -->
-  <v-container fluid class="d-flex flex-column" style="padding: 0">
-    <v-toolbar flat>
-      <v-toolbar-title>Пользователи</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn
-        @click="openAddDialog()"
-        variant="outlined"
-        class="action_button white--text"
-        >Добавить</v-btn>
-    </v-toolbar>
+  <v-toolbar flat>
+    <v-toolbar-title>Пользователи</v-toolbar-title>
+    <v-btn
+      @click="openAddDialog()"
+      variant="outlined"
+      class="action_button white--text"
+      >Добавить</v-btn>
+  </v-toolbar>
 
-    <users_table
-      ref="users_table"
-      @edit="openEditDialog"
-      @updateRole="openUpdateRoleDialog"
-      @delete="openDeleteDialog"
-      @reset="openResetPasswordDialog"
-      @changelog="fetchUsrChangelog"
-    />
+  <users_table
+    ref="users_table"
+    @edit="openEditDialog"
+    @updateRole="openUpdateRoleDialog"
+    @delete="openDeleteDialog"
+    @reset="openResetPasswordDialog"
+    @changelog="fetchUsrChangelog"
+  />
 
-    <UsersForm
-      :dialog="dialog"
-      :isAddMode="isAddMode"
-      :isEditMode="isEditMode"
-      :TableUsers="TableUsers"
-      :resetPassword="resetPassword"
-      @update:dialog="dialog = $event"
-      @save="refreshUsers"
-    />
+  <UsersForm
+    :dialog="dialog"
+    :isAddMode="isAddMode"
+    :isEditMode="isEditMode"
+    :TableUsers="TableUsers"
+    :resetPassword="resetPassword"
+    @update:dialog="dialog = $event"
+    @save="refreshUsers"
+  />
 
-    <UsersDeleteDialog
-      :deleteDialog="deleteDialog"
-      :deleteId="deleteUserId"
-      @apply-delete="deleteRecord(deleteUserId)"
-      @update:deleteDialog="deleteDialog = $event"
-      @delete="refreshUsers"
-    />
+  <UsersDeleteDialog
+    :deleteDialog="deleteDialog"
+    :deleteId="deleteUserId"
+    @apply-delete="deleteRecord(deleteUserId)"
+    @update:deleteDialog="deleteDialog = $event"
+    @delete="refreshUsers"
+  />
 
-    <UsersUpdateRoleDialog
-      :updateRoleDialog="updateRoleDialog"
-      :TableUsers="TableUsers"
-      @update:updateRoleDialog="updateRoleDialog = $event"
-      @save="refreshUsers"
-    />
+  <UsersUpdateRoleDialog
+    :updateRoleDialog="updateRoleDialog"
+    :TableUsers="TableUsers"
+    @update:updateRoleDialog="updateRoleDialog = $event"
+    @save="refreshUsers"
+  />
 
-    <changelogDialog
-      :changelogDialog="changelogDialog"
-      :changelog="usrChangelog"
-      @update:changelogDialog="changelogDialog = $event"
-    />
+  <changelogDialog
+    :changelogDialog="changelogDialog"
+    :changelog="usrChangelog"
+    @update:changelogDialog="changelogDialog = $event"
+  />
 
-    <div class="pageContent">
-    <v-pagination 
-    v-model="pagination.page"
-    :length="pagination.pages"
-    :total-visible="5"
-    :page="pagination.page"
-    @input="nextPage"></v-pagination>
-    </div>
-  </v-container>
+  <div class="pageContent">
+  <v-pagination 
+  v-model="pagination.page"
+  :length="pagination.pages"
+  :total-visible="5"
+  :page="pagination.page"
+  @input="nextPage"></v-pagination>
+  </div>
 </template>
 
 <script>
@@ -110,13 +107,25 @@
     this.getUsrPages();
   },
   mounted() {
-      this.$refs.users_table.fetchUsersPage(this.$route.query.page);
+      this.$refs.users_table.fetchUsersPage(
+        this.$route.query.page, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
       this.pagination.page = !parseInt(this.$route.query.page) ? this.pagination.page : parseInt(this.$route.query.page)
   },
   watch: {
     "pagination.page": function(value) {
-      this.$router.push({path: this.$route.fullPath, query: {page: value} })
-      this.$refs.users_table.fetchUsersPage(value);
+      this.$router.push({path: this.$route.fullPath, query: {
+        page: value,
+        sort_type: this.$route.query.sort_type,
+        order_by: this.$route.query.order_by,
+      } })
+      this.$refs.users_table.fetchUsersPage(
+        value, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
       this.page = value;
     }
   }, 
@@ -129,13 +138,25 @@
       });
     },
     nextPage(value){
-      this.$router.push({path: this.$route.fullPath, query: {page: value} })
-      this.$refs.users_table.fetchUsersPage(value);
+      this.$router.push({path: this.$route.fullPath, query: {
+        page: value,
+        sort_type: this.$route.query.sort_type,
+        order_by: this.$route.query.order_by,
+      } })
+      this.$refs.users_table.fetchUsersPage(
+        value, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
       this.page = value;
     },
     refreshUsers() {
       //this.$refs.users_table.fetchUsers();
-      this.$refs.users_table.fetchUsersPage(this.$route.query.page);
+      this.$refs.users_table.fetchUsersPage(
+        this.$route.query.page, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
     },
     openAddDialog() {
       this.resetPassword = false;
@@ -189,7 +210,11 @@
     },
     deleteRecord(item_id) {
       UsersApi.deleteUser(item_id).then(
-          () => this.$refs.users_table.fetchUsersPage(this.$route.query.page)
+          () => this.$refs.users_table.fetchUsersPage(
+            this.$route.query.page, 
+            this.$route.query.sort_type, 
+            this.$route.query.order_by
+          )
         )
     },
   },

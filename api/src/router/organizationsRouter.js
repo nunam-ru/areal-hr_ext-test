@@ -19,8 +19,11 @@ const organizationSchema = require('../controllers/val/organizationsVal')
 
 router.get('/organizations', async (req, res) => {
   try {
-    const { page = 1 } = req.query;
-    const organizations = await getOrganizations(page)
+    const { 
+      page = 1, 
+      sort_type = 'id',
+      order_by = 'asc' } = req.query;
+    const organizations = await getOrganizations(page, sort_type, order_by)
     return res.json(organizations)
   } catch (err) {
     console.error('Error organizations:', err);

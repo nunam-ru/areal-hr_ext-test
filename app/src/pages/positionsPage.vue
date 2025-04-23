@@ -1,45 +1,43 @@
 <template>
   <!-- <HelloWorld /> -->
-  <v-container fluid class="d-flex flex-column" style="padding: 0">
-    <v-toolbar flat>
-      <v-toolbar-title>Должности</v-toolbar-title>
+  <v-toolbar flat>
+    <v-toolbar-title>Должности</v-toolbar-title>
+    
+    <v-btn
+      @click="openAddDialog()"
+      variant="outlined"
+      class="action_button white--text"
+    >Добавить</v-btn>
+  </v-toolbar>
 
-      <v-btn
-        @click="openAddDialog()"
-        variant="outlined"
-        class="action_button white--text"
-      >Добавить</v-btn>
-    </v-toolbar>
+  <PositionForm
+    :dialog="dialog"
+    :isEditMode="isEditMode"
+    :TablePosition="TablePosition"
+    @update:dialog="dialog = $event"
+    @save="refreshPositions"
+  />
 
-    <PositionForm
-      :dialog="dialog"
-      :isEditMode="isEditMode"
-      :TablePosition="TablePosition"
-      @update:dialog="dialog = $event"
-      @save="refreshPositions"
-    />
+  <PositionDeleteDialog
+    :deleteDialog="deleteDialog"
+    :deleteId="deletePositionId"
+    @apply-delete="deleteRecord(deletePositionId)"
+    @update:deleteDialog="deleteDialog = $event"
+    @delete="refreshPositions"
+  />
 
-    <PositionDeleteDialog
-      :deleteDialog="deleteDialog"
-      :deleteId="deletePositionId"
-      @apply-delete="deleteRecord(deletePositionId)"
-      @update:deleteDialog="deleteDialog = $event"
-      @delete="refreshPositions"
-    />
+  <changelogDialog
+    :changelogDialog="changelogDialog"
+    :changelog="posChangelog"
+    @update:changelogDialog="changelogDialog = $event"
+  />
 
-    <changelogDialog
-      :changelogDialog="changelogDialog"
-      :changelog="posChangelog"
-      @update:changelogDialog="changelogDialog = $event"
-    />
+  <positions_table ref="positions_table"
+    @edit="openEditDialog"
+    @delete="openDeleteDialog" 
+    @changelog="fetchPosChangelog"
+  />
 
-    <positions_table ref="positions_table"
-      @edit="openEditDialog"
-      @delete="openDeleteDialog" 
-      @changelog="fetchPosChangelog"
-    />
-
-  </v-container>
 
   <div class="pageContent">
     <v-pagination 
@@ -89,13 +87,25 @@
     this.getPosPages();
   },
   mounted() {
-      this.$refs.positions_table.fetchPositionsPage(this.$route.query.page);
+      this.$refs.positions_table.fetchPositionsPage(
+        this.$route.query.page, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
       this.pagination.page = !parseInt(this.$route.query.page) ? this.pagination.page : parseInt(this.$route.query.page)
   },
   watch: {
     "pagination.page": function(value) {
-      this.$router.push({path: this.$route.fullPath, query: {page: value} })
-      this.$refs.positions_table.fetchPositionsPage(value);
+      this.$router.push({path: this.$route.fullPath, query: {
+        page: value,
+        sort_type: this.$route.query.sort_type,
+        order_by: this.$route.query.order_by,
+      } })
+      this.$refs.positions_table.fetchPositionsPage(
+        value, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
       this.page = value;
     }
   }, 
@@ -108,13 +118,25 @@
       });
     },
     nextPage(value){
-      this.$router.push({path: this.$route.fullPath, query: {page: value} })
-      this.$refs.positions_table.fetchPositionsPage(value);
+      this.$router.push({path: this.$route.fullPath, query: {
+        page: value,
+        sort_type: this.$route.query.sort_type,
+        order_by: this.$route.query.order_by,
+      } })
+      this.$refs.positions_table.fetchPositionsPage(
+        value, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
       this.page = value;
     },
     refreshPositions() {
       // this.$refs.positions_table.fetchPositions();
-      this.$refs.positions_table.fetchPositionsPage(this.$route.query.page);
+      this.$refs.positions_table.fetchPositionsPage(
+        this.$route.query.page, 
+        this.$route.query.sort_type, 
+        this.$route.query.order_by
+      );
     },
     openAddDialog() {
       this.TablePosition = [];
@@ -143,7 +165,11 @@
     },
     deleteRecord(item_id) {
         PositionsApi.deletePosition(item_id).then(
-          () => this.$refs.positions_table.fetchPositionsPage(this.$route.query.page)
+          () => this.$refs.positions_table.fetchPositionsPage(
+            this.$route.query.page, 
+            this.$route.query.sort_type, 
+            this.$route.query.order_by
+          )
         )
     },
   },
