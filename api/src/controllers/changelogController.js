@@ -30,12 +30,12 @@ async function addChangelog(
   object,
   changes,
   connection,
-  //req,
+  req,
 ) {
   try {
     //const date = new Date()
-    //const user_id = req.id
-    const user_id = 1
+    //const user_id = 1
+    const user_id = req.user.id
 
     await connection.query(
       `INSERT INTO changelog \

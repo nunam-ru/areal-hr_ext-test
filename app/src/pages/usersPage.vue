@@ -205,7 +205,7 @@
         })
         .catch((err) => {
           console.log(err);
-          this.historyUser = [];
+          this.usrChangelog = [];
         });
     },
     deleteRecord(item_id) {

@@ -144,7 +144,6 @@
         }
       },
       addUser() {
-        console.log(this.localUsers);
   
         UsersApi.addUser({
           last_name: this.localUsers.last_name,
