@@ -98,6 +98,7 @@
       fetchPositionsPage(page, sort_type, order_by) {
         PositionsApi.getPositions(page, sort_type, order_by).then((data) => {
             this.positions = data;
+            this.$parent.pagination.pages = Math.ceil(parseInt(data[0].pages) / this.$parent.pagination.itemsPerPage);
           }).catch((err) => {
             console.log(err)
           });

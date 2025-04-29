@@ -95,9 +95,6 @@
       },
     };
   },
-  created() {
-    this.getDepPages();
-  },
   mounted() {
       this.$refs.departmentsTable.fetchDepartmentsPage(
         this.$route.query.page, 
@@ -122,13 +119,6 @@
     }
   }, 
   methods: {
-    getDepPages() {
-      DepartmentsApi.getDepPages().then((data) => {
-          this.pagination.pages = Math.ceil(parseInt(data[0]['count']) / this.pagination.itemsPerPage);
-          }).catch((err) => {
-            console.log(err)
-      });
-    },
     nextPage(value){
       this.$router.push({path: this.$route.fullPath, query: {
         page: value,

@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "migrate:up": "node-pg-migrate up --envPath=../.env",
-    "migrate:up_seeds": "node-pg-migrate up -m ./migrations/seeds",
+    "migrate:up_seeds": "node-pg-migrate up -m ./migrations/seeds --envPath=../.env --no-check-order",
     "migrate:down": "node-pg-migrate down --envPath=../.env",
     "migrate:create": "node-pg-migrate create --envPath=../.env",
     "start": "node src/server.js",

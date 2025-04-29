@@ -16,7 +16,8 @@ async function getPositions(
       `SELECT positions.id, \
       positions.name AS position_name, \
       departments.name AS department_name, \
-      dep_id \
+      dep_id, \
+      (SELECT COUNT(id) FROM positions WHERE deleted_at IS NULL) as pages \
       FROM positions \
       JOIN departments ON positions.dep_id = departments.id \
       WHERE positions.deleted_at IS NULL\

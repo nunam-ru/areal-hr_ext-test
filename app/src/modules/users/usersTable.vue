@@ -120,6 +120,7 @@
       fetchUsersPage(page, sort_type, order_by) {
         UsersApi.getUsers(page, sort_type, order_by).then((data) => {
             this.users = data;
+            this.$parent.pagination.pages = Math.ceil(parseInt(data[0].pages) / this.$parent.pagination.itemsPerPage);
           }).catch((err) => {
             console.log(err)
           });

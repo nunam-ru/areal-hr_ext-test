@@ -119,6 +119,9 @@ exports.up = (pgm) => {
         login: { type: 'varchar(255)', notNull: true, unique: true },
         password: { type: 'varchar(255)', notNull: true },
         role_id: { type: 'integer', notNull: true, references: 'roles' },
+        created_at: {type: 'timestamptz'},
+        updated_at: {type: 'timestamptz'},
+        deleted_at: {type: 'timestamptz'},
     });
 
     // pgm.sql(`

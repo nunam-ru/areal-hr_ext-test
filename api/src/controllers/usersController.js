@@ -19,7 +19,8 @@ async function getUsers(
       third_name, \
       login, \
       password, \
-      roles.name AS roles_name \
+      roles.name AS roles_name, \
+      (SELECT COUNT(id) FROM users WHERE deleted_at IS NULL) as pages \
       FROM users \
       JOIN roles ON users.role_id = roles.id \
       WHERE deleted_at IS NULL \

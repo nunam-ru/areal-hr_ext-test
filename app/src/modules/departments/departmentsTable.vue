@@ -105,6 +105,7 @@
       fetchDepartmentsPage(page, sort_type, order_by) {
         DepartmentsApi.getDepartments(page, sort_type, order_by).then((data) => {
             this.departments = data;
+            this.$parent.pagination.pages = Math.ceil(parseInt(data[0].pages) / this.$parent.pagination.itemsPerPage);
             this.$emit("updateDepartments", this.departments);
           }).catch((err) => {
             console.log(err)

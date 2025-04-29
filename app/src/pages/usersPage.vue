@@ -103,9 +103,6 @@
       },
     };
   },
-  created() {
-    this.getUsrPages();
-  },
   mounted() {
       this.$refs.users_table.fetchUsersPage(
         this.$route.query.page, 
@@ -130,13 +127,6 @@
     }
   }, 
   methods: {
-    getUsrPages() {
-      UsersApi.getUsrPages().then((data) => {
-          this.pagination.pages = Math.ceil(parseInt(data[0]['count']) / this.pagination.itemsPerPage);
-          }).catch((err) => {
-            console.log(err)
-      });
-    },
     nextPage(value){
       this.$router.push({path: this.$route.fullPath, query: {
         page: value,

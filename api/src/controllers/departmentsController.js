@@ -19,7 +19,8 @@ async function getDepartments(
       pd.id as parent_id, \
       d.comment AS department_comment, \
       o.name AS organization_name, \
-      o.id as org_id \
+      o.id as org_id, \
+      (SELECT COUNT(id) FROM departments WHERE deleted_at IS NULL) as pages \
       FROM departments AS d \
       LEFT JOIN departments AS pd \
       ON d.parent_id = pd.id \
