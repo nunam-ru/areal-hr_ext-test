@@ -6,6 +6,7 @@
 - В папке app: npm install, затем npm run dev
 
 ## Запуск через docker: 
+- В папке проекта сделать файл .env, скопировать всё из .env.example, настроить под себя
 - В папке проекта: docker-compose up --build
 
 #### Windows 10 + VSCode + PostgreSQL 17 Docker
