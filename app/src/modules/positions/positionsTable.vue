@@ -53,9 +53,6 @@
       },
       };
     },
-    mounted() {
-      this.fetchPositions();
-    },
     methods: {
       sortHeader(field) {
         for (let [key, value] of Object.entries(this.asc)) {

@@ -63,9 +63,6 @@
         }
       };
     },
-    mounted() {
-      this.fetchUsers();
-    },
     methods: {
       sortHeader(field) {
         for (let [key, value] of Object.entries(this.asc)) {

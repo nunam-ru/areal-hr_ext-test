@@ -21,7 +21,6 @@ async function getOrganizations(
         LIMIT 10 OFFSET ($1-1)*10;`,
         [page]
       )
-      console.log(result)
       return result.rows
     } catch (err) {
       console.log(err)

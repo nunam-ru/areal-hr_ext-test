@@ -8,11 +8,19 @@ exports.up = (pgm) => {
       `)
 
     pgm.sql(`
+        SELECT setval('organizations_id_seq', max(id)) FROM organizations;
+        `)
+
+    pgm.sql(`
         INSERT INTO departments (id, name, parent_id, comment, org_id, created_at) VALUES
         (1, 'HR', null, 'Отдел кадров', 1, current_timestamp),
         (2, 'IT', 1, 'Отдел разработки', 2, current_timestamp)
         ON CONFLICT (id) DO NOTHING;
     `)
+
+    pgm.sql(`
+        SELECT setval('departments_id_seq', max(id)) FROM departments;
+        `)
 
     pgm.sql(`
         INSERT INTO positions (id, name, dep_id, created_at) VALUES
@@ -22,11 +30,19 @@ exports.up = (pgm) => {
     `)
 
     pgm.sql(`
+        SELECT setval('positions_id_seq', max(id)) FROM positions;
+        `)
+
+    pgm.sql(`
         INSERT INTO employees (id, last_name, first_name, third_name, birth_date, passport_series, passport_number, passport_code, passport_by, passport_date, address, created_at) VALUES
         (1, 'Иванов', 'Иван', 'Иванович', '2001-01-25', '1234', '567890', '123-456', 'МВД России', '2021-01-28', 'Ленина, 15', current_timestamp),
         (2, 'Петров', 'Петр', 'Петрович', '2002-01-30', '9876', '543210', '654-321', 'УМВД России', '2022-02-24', 'Ленина, 16', current_timestamp)
         ON CONFLICT (id) DO NOTHING;
     `)
+
+    pgm.sql(`
+        SELECT setval('employees_id_seq', max(id)) FROM employees;
+        `)
 
     pgm.sql(`
         INSERT INTO roles (id, name) VALUES
@@ -36,10 +52,18 @@ exports.up = (pgm) => {
         `)
 
     pgm.sql(`
+        SELECT setval('roles_id_seq', max(id)) FROM roles;
+        `)
+
+    pgm.sql(`
         INSERT INTO users (id, last_name, first_name, third_name, login, password, role_id) VALUES
         (1, 'Иванов', 'Иван', 'Иванович', 'admin', '$argon2id$v=19$m=65536,t=3,p=4$8nakMbZasHQCoQxWAqgWnQ$nZHsUn7Hy2oD80sRnYq64XeENH29ZrsPlM6+OFcLtLc', 1),
         (2, 'Петров', 'Петр', 'Петрович', 'manager', '$argon2id$v=19$m=65536,t=3,p=4$SroyPcFYHyr1K6ss6Khhjg$+0riDKlVKU1AszYHd6sBwAH2cOJZjqaPTSpbuo6l8Ic', 2)
         ON CONFLICT (id) DO NOTHING;
+        `)
+
+    pgm.sql(`
+        SELECT setval('users_id_seq', max(id)) FROM users;
         `)
 
 };

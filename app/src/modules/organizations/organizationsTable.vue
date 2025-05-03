@@ -53,9 +53,9 @@ export default {
       },
     };
   },
-  mounted() {
-    this.fetchOrganizations();
-  },
+  // mounted() {
+  //   this.fetchOrganizations();
+  // },
   methods: {
     sortHeader(field) {
       for (let [key, value] of Object.entries(this.asc)) {

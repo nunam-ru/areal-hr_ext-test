@@ -1,0 +1,18 @@
+FROM node:alpine
+WORKDIR /api
+
+ARG DATABASE_URL
+ARG API_PORT
+ARG APP_URL
+ARG SESSION_SECRET
+
+ENV DATABASE_URL = ${DATABASE_URL}
+ENV API_PORT = ${API_PORT}
+ENV APP_URL = ${APP_URL}
+ENV SESSION_SECRET = ${SESSION_SECRET}
+
+COPY /api/package.json package.json
+RUN npm install
+COPY /api .
+
+CMD ["sh", "-c", "npm run migrate:up && npm run migrate:up_seeds && npm start"]
