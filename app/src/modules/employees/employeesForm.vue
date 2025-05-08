@@ -46,6 +46,7 @@
               v-model="LocalEmployees.passport_series"
               label="Серия паспорта"
               :error-messages="errors.passport_series"
+              v-mask="'####'"
               required
             ></v-text-field>
             <v-text-field
@@ -53,6 +54,7 @@
               label="Номер паспорта"
               val
               :error-messages="errors.passport_number"
+              v-mask="'######'"
               required
             ></v-text-field>
             <v-text-field
@@ -60,6 +62,7 @@
               label="Код подразделения"
               val
               :error-messages="errors.passport_code"
+              v-mask="'###-###'"
               required
             ></v-text-field>
             <v-text-field
@@ -233,7 +236,7 @@
       fetchDepartments() {
         DepartmentApi.getDepartments()
           .then((data) => {
-            this.departments = data;
+            this.departments = data.table;
           })
           .catch((err) => {
             console.log(err)
@@ -242,7 +245,7 @@
       fetchPositions() {
         PositionsApi.getPositions()
           .then((data) => {
-            this.positions = data;
+            this.positions = data.table;
             this.positionsLoaded = true;
           })
           .catch((err) => {

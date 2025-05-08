@@ -12,15 +12,14 @@ async function getDepartments(
       page = 1
     }
     await connection.query('BEGIN')
-    const result = await connection.query(
+    const table = await connection.query(
       `SELECT d.id AS department_id, \
       d.name AS department_name, \
       pd.name AS parent_name, \
       pd.id as parent_id, \
       d.comment AS department_comment, \
       o.name AS organization_name, \
-      o.id as org_id, \
-      (SELECT COUNT(id) FROM departments WHERE deleted_at IS NULL) as pages \
+      o.id as org_id \
       FROM departments AS d \
       LEFT JOIN departments AS pd \
       ON d.parent_id = pd.id \
@@ -30,7 +29,14 @@ async function getDepartments(
       LIMIT 10 OFFSET ($1-1)*10;`,
       [page]
     )
-    return result.rows
+    const pages = await connection.query(
+      "SELECT COUNT(id) FROM departments WHERE deleted_at IS NULL",
+    )
+    const result = {
+      'table': table.rows,
+      'pages': pages.rows
+    }
+    return result
   } catch (err) {
     console.log(err)
   } finally {

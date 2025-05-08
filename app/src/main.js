@@ -10,6 +10,7 @@ import "@mdi/font/css/materialdesignicons.css";
 
 import App from "./App.vue";
 import router from "./router/index";
+import VueTheMask from 'vue-the-mask';
 
 const vuetify = createVuetify({
   components,
@@ -27,5 +28,6 @@ pinia.use(piniaPersist);
 app.use(pinia);
 app.use(vuetify);
 app.use(router);
+app.use(VueTheMask)
 
 app.mount("#app");

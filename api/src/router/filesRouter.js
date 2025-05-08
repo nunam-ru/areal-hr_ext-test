@@ -80,6 +80,7 @@ router.get('/files/download/:fileId', async (req, res) => {
         const { fileId } = req.params
         try {
             const file = await getFileById(fileId)
+            console.log(file)
             return res.download(file.path, file.name)
         } catch (err) {
             console.error('Error files:', err);

@@ -78,7 +78,7 @@
       fetchDepartments() {
         DepartmentApi.getDepartments()
           .then((data) => {
-            this.departments = data;
+            this.departments = data.table;
           })
           .catch((err) => {
             console.log(err)

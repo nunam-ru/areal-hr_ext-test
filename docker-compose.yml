@@ -42,6 +42,10 @@ services:
         API_PORT: ${API_PORT}
         APP_URL: ${APP_URL}
         SESSION_SECRET: ${SESSION_SECRET}
+        ADMIN_LOGIN: ${ADMIN_LOGIN}
+        ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+        MANAGER_LOGIN: ${MANAGER_LOGIN}
+        MANAGER_PASSWORD: ${MANAGER_PASSWORD}
     env_file: 
       - .env
     environment:
@@ -49,6 +53,10 @@ services:
       API_PORT: ${API_PORT}
       APP_URL: ${APP_URL}
       SESSION_SECRET: ${SESSION_SECRET}
+      ADMIN_LOGIN: ${ADMIN_LOGIN}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      MANAGER_LOGIN: ${MANAGER_LOGIN}
+      MANAGER_PASSWORD: ${MANAGER_PASSWORD}
     ports:
       - "${API_PORT}:${API_PORT}"
     depends_on:
@@ -76,7 +84,15 @@ services:
         restart: true
     networks:
       - HR-manager
-
+  docs:
+    container_name: docs
+    build: 
+      context: .
+      dockerfile: containers/docs/Dockerfile
+    networks:
+      - HR-manager
+    ports:
+      - "${DOCS_PORT}:${DOCS_PORT}"
 volumes:
   postgres_data:
 

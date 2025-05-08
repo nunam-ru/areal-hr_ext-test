@@ -19,7 +19,7 @@ async function getEmployees(
       page = 1
     }
     await connection.query('BEGIN')
-    const result = await connection.query(
+    const table = await connection.query(
       `SELECT e.id, \
         e.last_name, \
         e.first_name, \
@@ -36,8 +36,7 @@ async function getEmployees(
         p.id as position_id, \
         p.name AS position_name, \
         hr.salary, \
-        hr.deleted_at as fired, \
-        (SELECT COUNT(id) FROM employees WHERE deleted_at IS NULL) as pages \
+        hr.deleted_at as fired \
         FROM employees e \
         JOIN hr_operations hr on e.id = hr.emp_id \
         join departments d on hr.dep_id = d.id \
@@ -46,7 +45,14 @@ async function getEmployees(
         LIMIT 10 OFFSET ($1-1)*10;`,
       [page]
     )
-    return result.rows
+    const pages = await connection.query(
+      "SELECT COUNT(id) FROM employees WHERE deleted_at IS NULL",
+    )
+    const result = {
+      'table': table.rows,
+      'pages': pages.rows
+    }
+    return result
   } catch (err) {
     console.log(err)
   } finally {

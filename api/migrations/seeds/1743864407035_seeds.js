@@ -1,4 +1,16 @@
-exports.up = (pgm) => {
+require('dotenv').config({ path: '../.env' })
+const argon2 = require('argon2')
+
+exports.up = async (pgm) => {
+
+    const admin_login = process.env.ADMIN_LOGIN
+    const admin_password = await argon2.hash(process.env.ADMIN_PASSWORD, {
+    type: argon2.argon2id,
+    })
+    const manager_login = process.env.MANAGER_LOGIN
+    const manager_password = await argon2.hash(process.env.MANAGER_PASSWORD, {
+    type: argon2.argon2id,
+    })
 
     pgm.sql(`
         INSERT INTO organizations (id, name, comment, created_at) VALUES
@@ -57,8 +69,8 @@ exports.up = (pgm) => {
 
     pgm.sql(`
         INSERT INTO users (id, last_name, first_name, third_name, login, password, role_id) VALUES
-        (1, 'Иванов', 'Иван', 'Иванович', 'admin', '$argon2id$v=19$m=65536,t=3,p=4$8nakMbZasHQCoQxWAqgWnQ$nZHsUn7Hy2oD80sRnYq64XeENH29ZrsPlM6+OFcLtLc', 1),
-        (2, 'Петров', 'Петр', 'Петрович', 'manager', '$argon2id$v=19$m=65536,t=3,p=4$SroyPcFYHyr1K6ss6Khhjg$+0riDKlVKU1AszYHd6sBwAH2cOJZjqaPTSpbuo6l8Ic', 2)
+        (1, 'Иванов', 'Иван', 'Иванович', '${admin_login}', '${admin_password}', 1),
+        (2, 'Петров', 'Петр', 'Петрович', '${manager_login}', '${manager_password}', 2)
         ON CONFLICT (id) DO NOTHING;
         `)
 
@@ -71,11 +83,11 @@ exports.up = (pgm) => {
 
 // admin:
 // login: admin
-// password: Admin111!
+// password: $argon2id$v=19$m=65536,t=3,p=4$8nakMbZasHQCoQxWAqgWnQ$nZHsUn7Hy2oD80sRnYq64XeENH29ZrsPlM6+OFcLtLc
 
 // manager:
 // login: manager
-// password: Manager1!
+// password: $argon2id$v=19$m=65536,t=3,p=4$SroyPcFYHyr1K6ss6Khhjg$+0riDKlVKU1AszYHd6sBwAH2cOJZjqaPTSpbuo6l8Ic
 
 // exports.down = (pgm) => {
 //     pgm.dropTable('changelog');

@@ -12,16 +12,22 @@ async function getOrganizations(
         page = 1
       }
       await connection.query('BEGIN')
-      const result = await connection.query(
-        `SELECT *,
-        (SELECT COUNT(id) FROM organizations WHERE deleted_at IS NULL) as pages \
+      const table = await connection.query(
+        `SELECT *
         FROM organizations \
         WHERE deleted_at IS NULL \
         ORDER BY ${sort_type} ${order_by} \
         LIMIT 10 OFFSET ($1-1)*10;`,
         [page]
       )
-      return result.rows
+      const pages = await connection.query(
+        "SELECT COUNT(id) FROM organizations WHERE deleted_at IS NULL",
+      )
+      const result = {
+        'table': table.rows,
+        'pages': pages.rows
+      }
+      return result
     } catch (err) {
       console.log(err)
     } finally {

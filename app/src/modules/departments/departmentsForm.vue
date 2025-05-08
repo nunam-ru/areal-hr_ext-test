@@ -118,7 +118,7 @@
       fetchOrganizations() {
         OrganizationsApi.getOrganizations()
           .then((data) => {
-            this.organizations = data;
+            this.organizations = data.table;
           })
           .catch((err) => {
             console.log(err)

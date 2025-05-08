@@ -12,12 +12,11 @@ async function getPositions(
       page = 1
     }
     await connection.query('BEGIN')
-    const result = await connection.query(
+    const table = await connection.query(
       `SELECT positions.id, \
       positions.name AS position_name, \
       departments.name AS department_name, \
-      dep_id, \
-      (SELECT COUNT(id) FROM positions WHERE deleted_at IS NULL) as pages \
+      dep_id \
       FROM positions \
       JOIN departments ON positions.dep_id = departments.id \
       WHERE positions.deleted_at IS NULL\
@@ -25,7 +24,14 @@ async function getPositions(
       LIMIT 10 OFFSET ($1-1)*10;`,
       [page]
     )
-    return result.rows
+    const pages = await connection.query(
+      "SELECT COUNT(id) FROM positions WHERE deleted_at IS NULL",
+    )
+    const result = {
+      'table': table.rows,
+      'pages': pages.rows
+    }
+    return result
   } catch (err) {
     console.log(err)
   } finally {

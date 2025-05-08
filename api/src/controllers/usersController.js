@@ -12,15 +12,14 @@ async function getUsers(
     if (!parseInt(page)) {
       page = 1
     }
-    const result = await connection.query(
+    const table = await connection.query(
       `SELECT users.id, \
       last_name, \
       first_name, \
       third_name, \
       login, \
       password, \
-      roles.name AS roles_name, \
-      (SELECT COUNT(id) FROM users WHERE deleted_at IS NULL) as pages \
+      roles.name AS roles_name \
       FROM users \
       JOIN roles ON users.role_id = roles.id \
       WHERE deleted_at IS NULL \
@@ -28,7 +27,14 @@ async function getUsers(
       LIMIT 10 OFFSET ($1-1)*10;`,
       [page]
     )
-    return result.rows
+    const pages = await connection.query(
+      "SELECT COUNT(id) FROM users WHERE deleted_at IS NULL",
+    )
+    const result = {
+      'table': table.rows,
+      'pages': pages.rows
+    }
+    return result
   } catch (err) {
     console.log(err)
   } finally {
